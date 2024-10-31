@@ -11,7 +11,7 @@ services:
   web:
     image: node:lts
     user: 'node'
-    working_dir: /repository
+    working_dir: /home/jellyboxmeow/Project/CSCI-3308-Group4Project/ProjectSourceCode/
     env_file: .env
     environment:
       - NODE_ENV=development
@@ -20,7 +20,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./:/repository
+      - ./:/home/jellyboxmeow/Project/CSCI-3308-Group4Project/ProjectSourceCode/
     command: 'npm start'
 volumes:
   group-project:
