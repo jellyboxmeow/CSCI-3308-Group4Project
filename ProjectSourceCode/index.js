@@ -81,11 +81,11 @@ res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the A
 
 app.get('/anotherRoute', (req, res) => {
 //do something
-res.redirect('/register');
+res.redirect('/friends');
 });
 
-app.get('/register', (req, res) => {
-    res.render('pages/register', {error:null})
+app.get('/friends', (req, res) => {
+    res.render('pages/friends', {error:null})
 });
 
 // Authentication Middleware.
