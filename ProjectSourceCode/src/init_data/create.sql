@@ -12,13 +12,14 @@ CREATE TABLE IF NOT EXISTS community_forms(
     form_name VARCHAR(255) NOT NULL,
     form_type VARCHAR(50) NOT NULL,
     form_description TEXT,
-    form_user FOREIGN KEY,
+    form_user INT FOREIGN KEY,
     form_date DATE,
-    form_comments FOREIGN KEY
+    form_comments INT FOREIGN KEY
 );
 
 CREATE TABLE IF NOT EXISTS form-comments(
     id INT PRIMARY KEY,
+    form_id INT FOREIGN KEY,
     content TEXT,
     comment_date DATE,
     comment_user FOREIGN KEY
