@@ -6,6 +6,12 @@ CREATE TABLE IF NOT EXISTS users(
 
 );
 
+---TODO: Create a table for friends ---
+CREATE TABLE IF NOT EXISTS friends(
+    user_id INT FOREIGN KEY,
+    friend_id INT FOREIGN KEY
+);
+
 --- TODO: Create table(s) for Community Forms ---
 CREATE TABLE IF NOT EXISTS community_forms(
     id INT PRIMARY KEY,
