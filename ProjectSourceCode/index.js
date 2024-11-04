@@ -1,6 +1,3 @@
-import pokemon from 'pokemontcgsdk'
-
-pokemon.configure({ apiKey: '5838f973-9d21-42ef-90a8-38093551c0ea' })
 const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
@@ -69,6 +66,7 @@ app.use(
   })
 );
 
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
@@ -95,6 +93,10 @@ const auth = (req, res, next) => {
   }
   next();
 };
+
+app.get('/collection', (req, res) => {
+  res.render('pages/collection', { error: null })
+});
 
 // Authentication Required
 app.use(auth);
