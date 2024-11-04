@@ -84,6 +84,11 @@ app.get('/anotherRoute', (req, res) => {
 res.redirect('/register');
 });
 
+app.get('/login', (req, res) => {
+  //do something
+  res.render('pages/login');
+});
+
 app.get('/register', (req, res) => {
     res.render('pages/register', {error:null})
 });
