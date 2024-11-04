@@ -81,17 +81,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/anotherRoute', (req, res) => {
-  //do something
-  res.redirect('/register');
+//do something
+res.redirect('/login');
 });
 
 app.get('/login', (req, res) => {
-  //do something
-  res.render('pages/login');
+  res.render('pages/login', {error:null})
 });
 
 app.get('/register', (req, res) => {
-  res.render('pages/register', { error: null })
+  res.render('pages/register', {error:null})
+});
+
+app.get('/friends', (req, res) => {
+    res.render('pages/friends', {error:null})
 });
 
 // Authentication Middleware.
