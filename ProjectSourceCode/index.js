@@ -1,7 +1,5 @@
-// *****************************************************
-// <!-- Section 1 : Import Dependencies -->
-// *****************************************************
 
+const pokemon = require('pokemontcgsdk');
 const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
@@ -12,6 +10,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+
+pokemon.configure({ apiKey: process.env.API_KEY })
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -70,18 +70,19 @@ app.use(
   })
 );
 
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
+  res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
 });
 
 app.get('/anotherRoute', (req, res) => {
-//do something
-res.redirect('/register');
+  //do something
+  res.redirect('/register');
 });
 
 app.get('/login', (req, res) => {
@@ -90,17 +91,25 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-    res.render('pages/register', {error:null})
+  res.render('pages/register', { error: null })
 });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-    if (!req.session.user) {
-        // Default to login page.
-        return res.redirect('/login');
-    }
-    next();
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
 };
+
+app.get('/collection', (req, res) => {
+  pokemon.card.find('base1-4')
+    .then(card => {
+      console.log(card.name) // "Charizard"
+    })
+  res.render('pages/collection', { error: null })
+});
 
 // Authentication Required
 app.use(auth);
