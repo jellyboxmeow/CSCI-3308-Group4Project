@@ -81,7 +81,15 @@ res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the A
 
 app.get('/anotherRoute', (req, res) => {
 //do something
-res.redirect('/friends');
+res.redirect('/login');
+});
+
+app.get('/login', (req, res) => {
+  res.render('pages/login', {error:null})
+});
+
+app.get('/register', (req, res) => {
+  res.render('pages/register', {error:null})
 });
 
 app.get('/friends', (req, res) => {
