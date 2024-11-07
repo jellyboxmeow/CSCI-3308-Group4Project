@@ -1,9 +1,9 @@
 --- TODO: Create a session management table, Users, Login, etc. ---
 CREATE TABLE IF NOT EXISTS users(
     id INT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL
 );
 
 ---TODO: Create a table for friends ---
