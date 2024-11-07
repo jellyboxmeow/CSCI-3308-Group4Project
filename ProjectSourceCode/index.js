@@ -80,6 +80,10 @@ app.get('/', (req, res) => {
   res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 app.get('/anotherRoute', (req, res) => {
 //do something
 res.redirect('/login');
