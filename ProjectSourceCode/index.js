@@ -1,5 +1,4 @@
 
-const pokemon = require('pokemontcgsdk');
 const express = require('express'); // To build an application server or API
 const app = express();
 const handlebars = require('express-handlebars');
@@ -11,7 +10,6 @@ const session = require('express-session'); // To set the session object. To sto
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 
-pokemon.configure({ apiKey: process.env.API_KEY })
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -99,11 +97,18 @@ const auth = (req, res, next) => {
 };
 
 app.get('/collection', (req, res) => {
-  pokemon.card.find('base1-4')
-    .then(card => {
-      console.log(card.name) // "Charizard"
+  axios({
+    url: 'https://api.pokemontcg.io/v2/cards?q=name:charizard&page=1&pageSize=25',
+    method: 'GET',
+  })
+    .then(results => {
+      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      res.render('pages/collection', { cards: results.data.data });
     })
-  res.render('pages/collection', { error: null })
+    .catch(error => {
+      // Handle errors
+      res.status(400);
+    });
 });
 
 // Authentication Required
