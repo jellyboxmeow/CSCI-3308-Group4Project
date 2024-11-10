@@ -1,5 +1,5 @@
 --- INSERT test user---
-INSERT INTO users(username, password) VALUES ('test', 'test');
+INSERT INTO users(username, password, status) VALUES ('test', 'test', 'admin');
 
 --- INSERT test community form ---
 INSERT INTO form_comments(form_comments_id, content, comment_date) VALUES (1, 'test comment', '11/3/2024');
