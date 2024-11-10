@@ -1,6 +1,3 @@
-// *****************************************************
-// <!-- Section 1 : Import Dependencies -->
-// *****************************************************
 
 const express = require('express'); // To build an application server or API
 const app = express();
@@ -12,6 +9,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -70,32 +68,56 @@ app.use(
   })
 );
 
+
 // *****************************************************
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
+  res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
 });
 
 app.get('/anotherRoute', (req, res) => {
 //do something
-res.redirect('/register');
+res.redirect('/login');
+});
+
+app.get('/login', (req, res) => {
+  res.render('pages/login', {error:null})
 });
 
 app.get('/register', (req, res) => {
-    res.render('pages/register', {error:null})
+  res.render('pages/register', {error:null})
+});
+
+app.get('/friends', (req, res) => {
+    res.render('pages/friends', {error:null})
 });
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
-    if (!req.session.user) {
-        // Default to login page.
-        return res.redirect('/login');
-    }
-    next();
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
 };
+
+app.get('/collection', (req, res) => {
+  axios({
+    url: 'https://api.pokemontcg.io/v2/cards?q=name:charizard&page=1&pageSize=25',
+    method: 'GET',
+  })
+    .then(results => {
+      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      res.render('pages/collection', { cards: results.data.data });
+    })
+    .catch(error => {
+      // Handle errors
+      res.status(400);
+    });
+});
 
 // Authentication Required
 app.use(auth);
