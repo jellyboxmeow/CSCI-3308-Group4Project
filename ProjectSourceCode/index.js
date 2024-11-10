@@ -57,7 +57,7 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
   })
 );
@@ -78,17 +78,84 @@ app.get('/', (req, res) => {
   res.redirect('/anotherRoute'); //this will call the /anotherRoute route in the API
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 app.get('/anotherRoute', (req, res) => {
 //do something
 res.redirect('/login');
 });
 
+
 app.get('/login', (req, res) => {
-  res.render('pages/login', {error:null})
+  res.render('pages/login', { error: null })
 });
 
 app.get('/register', (req, res) => {
-  res.render('pages/register', {error:null})
+  res.render('pages/register', { error: null })
+});
+
+app.get('/friends', (req, res) => {
+  res.render('pages/friends', { error: null })
+});
+
+// Register
+app.post('/register', async (req, res) => {
+  //hash the password using bcrypt library
+  try{
+    const { username, password } = req.body;
+    
+    // Ensure username and password are provided
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    // Hash the password using bcrypt
+    const hash = await bcrypt.hash(password, 10);
+
+    // Check if the username already exists in the database
+    const userCheckQuery = 'SELECT * FROM users WHERE username = $1';
+    const existingUser = await db.oneOrNone(userCheckQuery, [username]);
+    if (existingUser) {
+      return res.status(400).redirect('/register');
+    }
+
+    // Insert new user into the database
+    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2)';
+    await db.none(queryText, [username, hash]);
+
+    // Respond with success message
+    // res.status(200).json({ message: 'Success' });
+    console.log('Redirecting to /login');
+    return res.status(302).redirect('/login');
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Registration failed. Please try again.' });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  // Define the SQL query to fetch the user with the provided username
+  const query = 'SELECT * FROM users WHERE username = $1';
+
+  // Query the database for the user. If the user does not exist, 'db.oneOrNone' will return null.
+  const user = await db.oneOrNone(query, [req.body.username]);
+
+  // Compare the hashed password from the database with the one provided in the login form
+  if (user) {
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (match) {
+      req.session.user = user; // Store user data in the session
+      req.session.save(() => {
+        return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+      });// Redirect to the 'home' page after successful login
+    } else {
+      res.render('pages/login'); // Render the login page with an error message
+    }
+  } else {
+    res.redirect('/register'); // Redirect the user to the registration page
+  }
 });
 
 app.get('/friends', (req, res) => {
@@ -125,5 +192,6 @@ app.use(auth);
 // <!-- Section 5 : Start Server-->
 // *****************************************************
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
+// app.listen(3000);
 console.log('Server is listening on port 3000');
