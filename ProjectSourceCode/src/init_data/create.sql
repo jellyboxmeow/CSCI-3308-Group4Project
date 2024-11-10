@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS form_comments(
     content TEXT,
     comment_date DATE
     -- comment_user FOREIGN KEY
- };
+);
  
 ---TODO: Create a table for friends ---
 CREATE TABLE IF NOT EXISTS friends(
