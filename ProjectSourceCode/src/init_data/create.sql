@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS users(
     id INT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password VARCHAR(50) NOT NULL
-
 );
 
 ---TODO: Create a table for friends ---
