@@ -122,7 +122,7 @@ app.post('/register', async (req, res) => {
     }
 
     // Insert new user into the database
-    const queryText = `INSERT INTO users (username, password) VALUES ($1, $2)`;
+    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2)';
     await db.none(queryText, [username, hash]);
 
     // Respond with success message
@@ -151,7 +151,7 @@ app.post('/login', async (req, res) => {
         return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
       });// Redirect to the 'home' page after successful login
     } else {
-      return res.status(400).redirect('/login'); // Render the login page with an error message
+        return res.status(400).redirect('/login'); // Render the login page with an error message
     }
   } else {
     res.redirect('/register'); // Redirect the user to the registration page
