@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS cards(
 --- TODO: Create a table for Deck value ---
 DROP TABLE IF EXISTS deck CASCADE;
 CREATE TABLE IF NOT EXISTS deck(
-    id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     cards INT,
     FOREIGN KEY (cards) REFERENCES cards(id) ON DELETE CASCADE,
     cards2 INT,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users(
     users_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password CHAR(60) NOT NULL,
-    status VARCHAR(50) NOT NULL,
+    status VARCHAR(50),
     deck_id INT,
     FOREIGN KEY (deck_id) REFERENCES deck(id) ON DELETE CASCADE
 );
