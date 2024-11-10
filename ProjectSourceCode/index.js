@@ -151,7 +151,7 @@ app.post('/login', async (req, res) => {
         return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
       });// Redirect to the 'home' page after successful login
     } else {
-      res.render('pages/login'); // Render the login page with an error message
+        return res.status(400).redirect('/login'); // Render the login page with an error message
     }
   } else {
     res.redirect('/register'); // Redirect the user to the registration page
