@@ -122,8 +122,8 @@ app.post('/register', async (req, res) => {
     }
 
     // Insert new user into the database
-    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2)';
-    await db.none(queryText, [username, hash]);
+    const queryText = `INSERT INTO users (username, password, status) VALUES ($1, $2, $3)`;
+    await db.none(queryText, [username, hash, 'normal']);
 
     // Respond with success message
     // res.status(200).json({ message: 'Success' });
