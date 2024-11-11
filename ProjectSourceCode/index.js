@@ -83,8 +83,8 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/anotherRoute', (req, res) => {
-//do something
-res.redirect('/login');
+  //do something
+  res.redirect('/login');
 });
 
 
@@ -159,8 +159,12 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-    res.render('pages/friends', {error:null})
+  res.render('pages/friends', { error: null })
 });
+
+
+
+
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
