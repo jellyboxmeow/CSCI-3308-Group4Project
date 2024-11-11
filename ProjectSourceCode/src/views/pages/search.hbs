@@ -1,0 +1,16 @@
+<div class="search_bar">'
+    <form action="/search" method="GET">
+        <label for="search">Search Pokemon:</label>
+        <input type="search" id="search" name="search">
+        <button type="submit">Search</button>
+    </form>
+
+</div>
+<div class="pokemon-cards"
+    style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 100px); row-gap: 150px;">
+    {{#each cards}}
+    <div class="card">
+        <img src="{{this.images.large}}" alt="{{this.name}}" style="width: 200px; height:auto;">
+    </div>
+    {{/each}}
+</div>
