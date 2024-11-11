@@ -1,26 +1,31 @@
 <div class="container-fluid d-flex justify-content-center vstack col-md-12 mx-auto">
     <h1 class="fw-bold text-decoration-underline">Friends</h1>
+
+    {{#if friendsList.length}}
     <table class="table table-striped container-fluid">
-        <tr>
-            <th></th>
-            <th class="fs-4">Username</th>
-            <th class="text-end fs-4">View Collection</th>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Example1</td>
-            {{!-- <td>Oct. 12 2024</td> --}}
-            <td class="text-end">
-                <button class="btn btn-outline-success">View</button>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>Example2</td>
-            {{!-- <td>Jan. 2 2024</td> --}}
-            <td class="text-end">
-                <button class="btn btn-outline-success">View</button>
-            </td>
-        </tr>
+        <thead>
+                <tr>
+                    <th></th>
+                    <th class="fs-4">Username</th>
+                    <th class="text-end fs-4">View Collection</th>
+                </tr>
+        </thead>
+        <tbody>
+            {{#each friendsList}}
+                <tr>
+                    <td></td>
+                    <td>{{this}}</td>
+                    {{!-- <td>Oct. 12 2024</td> --}}
+                    <td class="text-end">
+                        <a class="btn btn-outline-success" href="/search">View</a>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
     </table>
+    {{!-- Message for if you have no friends --}}
+    {{else}}
+            <p>You have no friends</p>
+    {{/if}}
+    <button class="btn btn-outline-secondary">+Add Friend</button>
 </div>

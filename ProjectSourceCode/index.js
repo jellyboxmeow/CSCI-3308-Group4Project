@@ -97,7 +97,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null })
+  res.render('pages/friends', { error: null, friendsList: req.session.friends || []})
 });
 
 // Register
@@ -147,8 +147,22 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
       req.session.user = user; // Store user data in the session
-      req.session.save(() => {
-        return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+      req.session.save(async () => {
+        const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
+        ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
+        AND users.username != $2\
+        UNION \
+        SELECT users.username FROM friends INNER JOIN users ON \
+        users.users_id = friends.user_id WHERE friends.friend_id = $1 \
+        AND users.username != $2;';
+        // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
+        const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
+        req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
+        console.log(friendsList); // checking results
+        console.log(req.session.friends); //debugging session friends
+        req.session.save(()=>{
+          return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+        });
       });// Redirect to the 'home' page after successful login
     } else {
       return res.status(400).redirect('/login'); // Render the login page with an error message
@@ -157,12 +171,6 @@ app.post('/login', async (req, res) => {
     res.redirect('/register'); // Redirect the user to the registration page
   }
 });
-
-app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null })
-});
-
-
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
