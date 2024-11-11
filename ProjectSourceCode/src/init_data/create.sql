@@ -39,12 +39,15 @@ CREATE TABLE IF NOT EXISTS form_comments(
 );
  
 ---TODO: Create a table for friends ---
+DROP TABLE IF EXISTS friends CASCADE;
 CREATE TABLE IF NOT EXISTS friends(
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(users_id) ON DELETE CASCADE,
     friend_id INT NOT NULL,
     FOREIGN KEY (friend_id) REFERENCES users(users_id) ON DELETE CASCADE
 );
+
+ALTER TABLE friends ADD CONSTRAINT unique_friendship UNIQUE (user_id, friend_id);
 
 --- TODO: Create table(s) for Community Forms ---
 DROP TABLE IF EXISTS community_forms CASCADE;
