@@ -79,20 +79,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/anotherRoute', (req, res) => {
-//do something
-res.redirect('/login');
+  //do something
+  res.redirect('/login');
 });
 
 app.get('/login', (req, res) => {
-  res.render('pages/login', {error:null})
+  res.render('pages/login', { error: null })
 });
 
 app.get('/register', (req, res) => {
-  res.render('pages/register', {error:null})
+  res.render('pages/register', { error: null })
 });
 
 app.get('/friends', (req, res) => {
-    res.render('pages/friends', {error:null})
+  res.render('pages/friends', { error: null })
 });
 
 // Authentication Middleware.
@@ -104,14 +104,19 @@ const auth = (req, res, next) => {
   next();
 };
 
-app.get('/collection', (req, res) => {
+app.get('/search', (req, res) => {
+  const name = req.query.search;
+  console.log(name);
   axios({
-    url: 'https://api.pokemontcg.io/v2/cards?q=name:charizard&page=1&pageSize=25',
+    url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
+    params: {
+      q: `name:${name}*`
+    }
   })
     .then(results => {
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/collection', { cards: results.data.data });
+      res.render('pages/search', { cards: results.data.data });
     })
     .catch(error => {
       // Handle errors
