@@ -6,20 +6,28 @@
             <th class="fs-4">Username</th>
             <th class="text-end fs-4">View Collection</th>
         </tr>
-        <tr>
-            <td></td>
-            <td>Example1</td>
-            {{!-- <td>Oct. 12 2024</td> --}}
-            <td class="text-end">
-                <button class="btn btn-outline-success">View</button>
-            </td>
-        </tr>
+        {{!-- {{#each results}} --}}
+            <tr>
+                <td></td>
+                <td>{{this.friend_id}}</td>
+                {{!-- <td>Oct. 12 2024</td> --}}
+                <td class="text-end">
+                    <a class="btn btn-outline-success" href="/collection">View</a>
+                </td>
+            </tr>
+            {{!-- {{else}}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        {{/each}} --}}
         <tr>
             <td></td>
             <td>Example2</td>
             {{!-- <td>Jan. 2 2024</td> --}}
             <td class="text-end">
-                <button class="btn btn-outline-success">View</button>
+                <a class="btn btn-outline-success" href="/collection">View</a>
             </td>
         </tr>
     </table>

@@ -96,8 +96,18 @@ app.get('/register', (req, res) => {
   res.render('pages/register', { error: null })
 });
 
-app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null })
+app.get('/friends', async (req, res) => {
+  // const username = user.username;
+  try{
+    // const userIdQuery = 'SELECT users_id FROM users WHERE username = $1';
+    // const id = await db.oneOrNone(userIdQuery, [username]);
+    // const friendsListQuery = 'SELECT friend_id FROM friends INNER JOIN users ON users.users_id = friends.user_id WHERE friends.user_id = $1';
+    // const results = await db.oneOrNone(friendsListQuery, [id]);
+    res.render('pages/friends', { error: null });
+    // res.render('pages/friends', { results, error: null });
+  } catch(error){
+
+  }
 });
 
 // Register

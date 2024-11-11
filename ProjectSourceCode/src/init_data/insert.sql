@@ -15,5 +15,7 @@ INSERT INTO community_forms(community_forms_id, form_name, form_type, form_descr
 -- INSERT INTO form_comments(id, form_id, content, comment_date, comment_user) VALUES (1, 1, 'test comment', '11/3/2024', 1);
 -- INSERT INTO community_forms(id, form_name, form_type, form_description, form_date) VALUES (1, 'test form', 'test type', 'test description', '11/3/2024');
 
+-- INSERT friends --
+INSERT INTO friends(user_id, friend_id) VALUES (1, 2);
 
 --- INSERT test deck values ---
