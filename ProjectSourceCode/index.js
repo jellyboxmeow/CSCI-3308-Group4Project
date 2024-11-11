@@ -79,7 +79,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+  res.json({ status: 'success', message: 'Welcome!' });
 });
 
 app.get('/anotherRoute', (req, res) => {
@@ -103,9 +103,9 @@ app.get('/friends', (req, res) => {
 // Register
 app.post('/register', async (req, res) => {
   //hash the password using bcrypt library
-  try{
+  try {
     const { username, password } = req.body;
-    
+
     // Ensure username and password are provided
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
@@ -129,7 +129,7 @@ app.post('/register', async (req, res) => {
     // res.status(200).json({ message: 'Success' });
     console.log('Redirecting to /login');
     return res.status(302).redirect('/login');
-  }catch (err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Registration failed. Please try again.' });
   }
@@ -165,7 +165,7 @@ app.post('/login', async (req, res) => {
         });
       });// Redirect to the 'home' page after successful login
     } else {
-        return res.status(400).redirect('/login'); // Render the login page with an error message
+      return res.status(400).redirect('/login'); // Render the login page with an error message
     }
   } else {
     res.redirect('/register'); // Redirect the user to the registration page
@@ -181,14 +181,19 @@ const auth = (req, res, next) => {
   next();
 };
 
-app.get('/collection', (req, res) => {
+app.get('/search', (req, res) => {
+  const name = req.query.search;
+  console.log(name);
   axios({
-    url: 'https://api.pokemontcg.io/v2/cards?q=name:charizard&page=1&pageSize=25',
+    url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
+    params: {
+      q: `name:${name}*`
+    }
   })
     .then(results => {
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/collection', { cards: results.data.data });
+      res.render('pages/search', { cards: results.data.data });
     })
     .catch(error => {
       // Handle errors
