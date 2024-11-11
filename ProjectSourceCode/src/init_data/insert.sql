@@ -17,5 +17,6 @@ INSERT INTO community_forms(community_forms_id, form_name, form_type, form_descr
 
 -- INSERT friends --
 INSERT INTO friends(user_id, friend_id) VALUES (1, 2);
+-- INSERT INTO friends(user_id, friend_id) VALUES (1, 3);
 
 --- INSERT test deck values ---
