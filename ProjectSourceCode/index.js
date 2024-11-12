@@ -105,7 +105,7 @@ app.get('/friends', (req, res) => {
   }
 });
 
-app.post('/add-friend', (req, res) => {
+app.post('/add-friend', async (req, res) => {
   const {users_id, friend_username} = req.body;
   if(!users_id || !friend_username){
     if(!users_id && !friend_username){
@@ -116,10 +116,25 @@ app.post('/add-friend', (req, res) => {
     }
     return res.status(400).json({ success: false, message: 'friend_username not passed' });
   }
-  console.log('Current User ID:', users_id);
-  console.log('Friend Username:', friend_username);
 
-  return res.status(200).json({ success: true, message: 'Friend added successfully' });
+  // console.log('Current User ID:', users_id);
+  // console.log('Friend Username:', friend_username);
+  try{
+    const friendQuery = 'SELECT users_id FROM users WHERE username = $1';
+    const friend = await db.oneOrNone(friendQuery, [friend_username]);
+    if(!friend){
+      return res.status(400).json({success: false, message: 'Please enter a valid user'});
+    }
+    //have check for duplicate friend
+    const friend_id_in_users_table = friend.users_id;
+    await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
+    return res.status(200).json({success: true, message: 'Friend added successfuly'});
+    // return res.redirect('/friends');
+  }catch (err){
+    console.error(err);
+    return res.status(500).json({success: false, message: err.message || err});
+  }
+  // return res.status(200).json({ success: true, message: 'Friend added successfully' });
 });
 
 // Register
