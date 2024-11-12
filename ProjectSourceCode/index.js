@@ -97,7 +97,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null, friendsList: req.session.friends || []})
+  res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
 });
 
 // Register
@@ -181,6 +181,20 @@ const auth = (req, res, next) => {
   next();
 };
 
+app.use('/friends', auth);
+app.use('/search', auth);
+app.use('/profile', auth);
+app.use('/home', auth);
+app.use('/logout', auth);
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', { user: req.session.user, error: null })
+});
+
+app.get('/home', (req, res) => {
+  res.render('pages/home', { user: req.session.user, error: null})
+});
+
 app.get('/search', (req, res) => {
   const name = req.query.search;
   console.log(name);
@@ -193,12 +207,17 @@ app.get('/search', (req, res) => {
   })
     .then(results => {
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/search', { cards: results.data.data });
+      res.render('pages/search', { user: req.session.user , cards: results.data.data});
     })
     .catch(error => {
       // Handle errors
       res.status(400);
     });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/login');
 });
 
 // Authentication Required
