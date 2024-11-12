@@ -97,7 +97,29 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
+  if(!req.session.user){
+    return res.redirect('/login');
+  }
+  else{
+    res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
+  }
+});
+
+app.post('/add-friend', (req, res) => {
+  const {users_id, friend_username} = req.body;
+  if(!users_id || !friend_username){
+    if(!users_id && !friend_username){
+      return res.status(400).json({ success: false, message: 'users_id and friendUsername not passed' });
+    }
+    else if(!users_id){
+      return res.status(400).json({ success: false, message: 'users_id not passed' });
+    }
+    return res.status(400).json({ success: false, message: 'friend_username not passed' });
+  }
+  console.log('Current User ID:', users_id);
+  console.log('Friend Username:', friend_username);
+
+  return res.status(200).json({ success: true, message: 'Friend added successfully' });
 });
 
 // Register
