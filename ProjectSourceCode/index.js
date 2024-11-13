@@ -97,7 +97,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null })
+  res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
 });
 
 // Register
@@ -147,8 +147,22 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
       req.session.user = user; // Store user data in the session
-      req.session.save(() => {
-        return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+      req.session.save(async () => {
+        const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
+        ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
+        AND users.username != $2\
+        UNION \
+        SELECT users.username FROM friends INNER JOIN users ON \
+        users.users_id = friends.user_id WHERE friends.friend_id = $1 \
+        AND users.username != $2;';
+        // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
+        const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
+        req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
+        console.log(friendsList); // checking results
+        console.log(req.session.friends); //debugging session friends
+        req.session.save(()=>{
+          return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+        });
       });// Redirect to the 'home' page after successful login
     } else {
       return res.status(400).redirect('/login'); // Render the login page with an error message
@@ -158,12 +172,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null })
-});
-
-
-
 // Authentication Middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -172,6 +180,20 @@ const auth = (req, res, next) => {
   }
   next();
 };
+
+app.use('/friends', auth);
+app.use('/search', auth);
+app.use('/profile', auth);
+app.use('/home', auth);
+app.use('/logout', auth);
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', { user: req.session.user, error: null })
+});
+
+app.get('/home', (req, res) => {
+  res.render('pages/home', { user: req.session.user, error: null})
+});
 
 app.get('/search', (req, res) => {
   const name = req.query.search;
@@ -185,12 +207,17 @@ app.get('/search', (req, res) => {
   })
     .then(results => {
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/search', { cards: results.data.data });
+      res.render('pages/search', { user: req.session.user , cards: results.data.data});
     })
     .catch(error => {
       // Handle errors
       res.status(400);
     });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/login');
 });
 
 // Authentication Required
