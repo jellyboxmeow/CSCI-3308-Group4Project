@@ -125,9 +125,21 @@ app.post('/add-friend', async (req, res) => {
     if(!friend){
       return res.status(400).json({success: false, message: 'Please enter a valid user'});
     }
-    //have check for duplicate friend
+    //have check for if already friends
+    const checkFriendsTable = 'SELECT 1 FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)';
+      //SELECT 1 is for checking if there exists any rows
+    const check = await db.any(checkFriendsTable, [users_id, friend.users_id]);
+    if(check.length > 0){
+      return res.status(400).json({success: false, message: 'Silly goose you are already friends'});
+    }
     const friend_id_in_users_table = friend.users_id;
     await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
+
+    const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
+    const friendsList = await db.any(updatedFriendsQuery, [users_id]);
+
+    req.session.friends = friendsList.map(friend => friend.username);
+
     return res.status(200).json({success: true, message: 'Friend added successfuly'});
     // return res.redirect('/friends');
   }catch (err){

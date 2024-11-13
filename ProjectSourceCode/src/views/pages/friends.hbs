@@ -10,7 +10,7 @@
                     <th class="text-end fs-4">View Collection</th>
                 </tr>
         </thead>
-        <tbody>
+        <tbody id="friendsListBody">
             {{#each friendsList}}
                 <tr>
                     <td></td>
@@ -99,6 +99,26 @@
 
                     // Remove the success message after 3 seconds
                     setTimeout(() => successMessage.remove(), 3000);
+                    console.log(data);
+
+                    // Dynamically add the new friend to the friend list
+                    //friendsListBody.innerHTML = '';
+
+                    const friendsTable = document.querySelector('tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                    <td></td>
+                    <td>${friend_username}</td>
+                    <td class="text-end">
+                        <a class="btn btn-outline-success" href="/search">View</a>
+                    </td>
+                    `;
+                    friendsTable.appendChild(newRow);
+
+
+
+                    // Optionally, reset the form fields for the next entry
+                    document.getElementById('friendUsername').value = ''; 
 
                     // Optionally, update the friend list on the page or show a success message
                     console.log('Friend added successfully!');
