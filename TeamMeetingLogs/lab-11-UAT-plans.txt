@@ -1,0 +1,23 @@
+Feature 1–Adding Friends
+    User Should be able to add other users as friends
+        User would require the friend’s distinct username
+    Information would get stored in the friends_db for the appropriate user
+
+Feature 2–Posting/Commenting on community forms
+    User should be able to post on community forms
+        Mandatory:
+        User requires a form type (i.e trading, showcase, guide, etc.)
+        User requires a form name 
+        User requires a description/content of the form
+    Information for posting will be stored on community_forms db
+    User should be able to comment under community forms
+        Mandatory:
+        User requires content to comment on the form
+        User requires a form to comment on via id
+    Information will be stored on the form-comments db 
+
+Feature 3–Viewing Friends Collections
+    User should be able to view friend’s collections
+        User would require a friend to interact with
+        When user clicks to view collection, display friend’s collection of cards including value and appropriate images
+    Information will be taken from friends and user dbs
