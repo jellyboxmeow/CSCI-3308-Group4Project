@@ -105,6 +105,7 @@ app.get('/friends', (req, res) => {
   }
 });
 
+//Need to add can add yourself to your own friends list
 app.post('/add-friend', async (req, res) => {
   const {users_id, friend_username} = req.body;
   if(!users_id || !friend_username){
@@ -125,12 +126,17 @@ app.post('/add-friend', async (req, res) => {
     if(!friend){
       return res.status(400).json({success: false, message: 'Please enter a valid user'});
     }
+    //checking for if someone put themselves as a friend
+    if(friend.users_id == users_id){
+      return res.status(400).json({success: false, message: 'You can not be friends with yourself'});
+    }
+
     //have check for if already friends
     const checkFriendsTable = 'SELECT 1 FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)';
       //SELECT 1 is for checking if there exists any rows
     const check = await db.any(checkFriendsTable, [users_id, friend.users_id]);
     if(check.length > 0){
-      return res.status(400).json({success: false, message: 'Silly goose you are already friends'});
+      return res.status(400).json({success: false, message: 'You already added them. Reload the page'});
     }
     const friend_id_in_users_table = friend.users_id;
     await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
@@ -140,7 +146,7 @@ app.post('/add-friend', async (req, res) => {
 
     req.session.friends = friendsList.map(friend => friend.username);
 
-    return res.status(200).json({success: true, message: 'Friend added successfuly'});
+    return res.status(200).json({success: true, message: 'Friend added successfuly. Reload the page if you do not see them'});
     // return res.redirect('/friends');
   }catch (err){
     console.error(err);
@@ -210,7 +216,7 @@ app.post('/login', async (req, res) => {
         console.log(friendsList); // checking results
         console.log(req.session.friends); //debugging session friends
         req.session.save(()=>{
-          return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+          return res.status(302).redirect('/home'); // Redirect to /friends on successful login
         });
       });// Redirect to the 'home' page after successful login
     } else {
