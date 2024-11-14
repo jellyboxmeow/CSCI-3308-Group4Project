@@ -97,7 +97,62 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  res.render('pages/friends', { error: null, friendsList: req.session.friends || []})
+  if(!req.session.user){
+    return res.redirect('/login');
+  }
+  else{
+    res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
+  }
+});
+
+//Need to add can add yourself to your own friends list
+app.post('/add-friend', async (req, res) => {
+  const {users_id, friend_username} = req.body;
+  if(!users_id || !friend_username){
+    if(!users_id && !friend_username){
+      return res.status(400).json({ success: false, message: 'users_id and friendUsername not passed' });
+    }
+    else if(!users_id){
+      return res.status(400).json({ success: false, message: 'users_id not passed' });
+    }
+    return res.status(400).json({ success: false, message: 'friend_username not passed' });
+  }
+
+  // console.log('Current User ID:', users_id);
+  // console.log('Friend Username:', friend_username);
+  try{
+    const friendQuery = 'SELECT users_id FROM users WHERE username = $1';
+    const friend = await db.oneOrNone(friendQuery, [friend_username]);
+    if(!friend){
+      return res.status(400).json({success: false, message: 'Please enter a valid user'});
+    }
+    //checking for if someone put themselves as a friend
+    if(friend.users_id == users_id){
+      return res.status(400).json({success: false, message: 'You can not be friends with yourself'});
+    }
+
+    //have check for if already friends
+    const checkFriendsTable = 'SELECT 1 FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)';
+      //SELECT 1 is for checking if there exists any rows
+    const check = await db.any(checkFriendsTable, [users_id, friend.users_id]);
+    if(check.length > 0){
+      return res.status(400).json({success: false, message: 'You already added them. Reload the page'});
+    }
+    const friend_id_in_users_table = friend.users_id;
+    await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
+
+    const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
+    const friendsList = await db.any(updatedFriendsQuery, [users_id]);
+
+    req.session.friends = friendsList.map(friend => friend.username);
+
+    return res.status(200).json({success: true, message: 'Friend added successfuly. Reload the page if you do not see them'});
+    // return res.redirect('/friends');
+  }catch (err){
+    console.error(err);
+    return res.status(500).json({success: false, message: err.message || err});
+  }
+  // return res.status(200).json({ success: true, message: 'Friend added successfully' });
 });
 
 // Register
@@ -161,7 +216,7 @@ app.post('/login', async (req, res) => {
         console.log(friendsList); // checking results
         console.log(req.session.friends); //debugging session friends
         req.session.save(()=>{
-          return res.status(302).redirect('/friends'); // Redirect to /friends on successful login
+          return res.status(302).redirect('/home'); // Redirect to /friends on successful login
         });
       });// Redirect to the 'home' page after successful login
     } else {
@@ -181,6 +236,20 @@ const auth = (req, res, next) => {
   next();
 };
 
+app.use('/friends', auth);
+app.use('/search', auth);
+app.use('/profile', auth);
+app.use('/home', auth);
+app.use('/logout', auth);
+
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', { user: req.session.user, error: null })
+});
+
+app.get('/home', (req, res) => {
+  res.render('pages/home', { user: req.session.user, error: null})
+});
+
 app.get('/search', (req, res) => {
   const name = req.query.search;
   console.log(name);
@@ -193,12 +262,17 @@ app.get('/search', (req, res) => {
   })
     .then(results => {
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/search', { cards: results.data.data });
+      res.render('pages/search', { user: req.session.user , cards: results.data.data});
     })
     .catch(error => {
       // Handle errors
       res.status(400);
     });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/login');
 });
 
 // Authentication Required

@@ -1,24 +1,58 @@
-<!-- TODO: Make nav bar to help direct users -->
 <header>
-    <nav class="navbar navbar-expand-sm border-bottom">
-        <div class="container">
-            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbar-collapse" aria-controls="navbar" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <!-- TODO: For login, add a <a> tag with an attribute href to call the '/login' API -->
-                        <a class="nav-link " href="/login">Login</a>
-                    </li>
-                </ul>
-                <div class="nav-item me-1">
-                    <!-- TODO: For regist, add a <a> tag with an attribute href to call the '/register API -->
-                    <a class="nav-link" href="/register">Register</a>
-                </div>
-            </div>
+  <nav class="navbar navbar-expand-sm border-bottom">
+    <div class="container">
+      <button
+        class="navbar-toggler ms-auto"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbar-collapse"
+        aria-controls="navbar"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar-collapse">
+        <ul class="navbar-nav me-auto">
+        <!-- Collection Link -->
+          {{#if user}}
+              <a class="nav-link" href="/home">Home</a>
+            {{else}}
+              <a class="nav-link disabled" href="/login">Home</a>
+            {{/if}} 
+          </li>
+          <li class="nav-item">
+            <!-- Collection Link -->
+          {{#if user}}
+              <a class="nav-link" href="/search">Search</a>
+            {{else}}
+              <a class="nav-link disabled" href="/login">Collection</a>
+            {{/if}} 
+          </li>
+            <!-- Profile Link -->
+          {{#if user}}
+              <a class="nav-link" href="/profile">Profile</a>
+            {{else}}
+              <a class="nav-link disabled" href="/login">Profile</a>
+            {{/if}} 
+          </li>
+          <li class="nav-item">
+            <!-- Friends Link -->
+            {{#if user}}
+              <a class="nav-link" href="/friends">Friends</a>
+            {{else}}
+              <a class="nav-link disabled" href="/login">Friends</a>
+            {{/if}}
+          </li>
+        </ul>
+        <div class="nav-item me-1">
+          <!-- Logout or Login -->
+          {{#if user}}
+            <a class="nav-link" href="/logout">Log Out</a>
+          {{else}}
+            <a class="nav-link" href="/login">Log In</a>
+          {{/if}}
         </div>
-    </nav>
+      </div>
+    </div>
+  </nav>
 </header>

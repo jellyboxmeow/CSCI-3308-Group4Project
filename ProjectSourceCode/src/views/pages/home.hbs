@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- source for home page template: https://www.w3schools.com/w3css/w3css_templates.asp -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body,
+        html {
+            height: 100%;
+            color: #000000;
+        }
+
+        /* Create a Parallax Effect */
+        .bgimg-1 {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* First image (Logo. Full height), to be able to have valuedeck on top of image */
+        .bgimg-1 {
+            background-image: url('https://static1.srcdn.com/wordpress/wp-content/uploads/2024/06/pokemon-go-tcg-cards.jpg');
+            min-height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- First Parallax Image with Logo Text -->
+    <div class="bgimg-1 w3-display-container" id="home">
+        <div class="w3-display-middle" style="white-space:nowrap;">
+            <span class="w3-center w3-padding-large w3-black w3-animate-opacity"
+                style="font-size: 5rem; padding: 30px 60px;">ValueDeck</span>
+        </div>
+    </div>
+
+
+    <!-- Container about valuedeck -->
+    <div class="w3-content w3-container w3-padding-64" id="about">
+        <h3 class="w3-center">Welcome to ValueDeck</h3>
+        <p class="w3-center">Your Cards, Your Collection, Your Value</p>
+        <p>ValueDeck is for trading game card collectors, who want to interact with their trading cards on a virtual
+            level. ValueDeck is a website that will allow card collectors all over the world to see the value of their
+            cards and trade cards with other users.
+            Our application will offer seamless experience for card evaluations, easy trading systems, and collection
+            management of current cards. ValueDeck offers accurate card prices
+            and user-to-user trading system, maximizing card collectors usage of their trading cards.
+        </p>
+        <p class="w3-center"> To get started with your collection and browse our cards, <a href="/search"> click here</a>!
+        </p>
+        <div class="w3-row">
+            <div class="w3-col m6 w3-center w3-padding-large">
+                <img src="https://cdn.pokecardhq.com/wp-content/uploads/2024/08/Pokemon_TCG_Shadowless_Pokemon_cards.jpg"
+                    class="w3-round w3-image" alt="pokemon" width="500" height="333">
+            </div>
+            <div class="w3-col m6 w3-center w3-padding-large">
+                <img src="https://pokeflip.com/cdn/shop/articles/Most_Valuable_Pokemon_Cards_of_All_Time.jpg?v=1714840666&width=1024"
+                    class="w3-round w3-image" alt="pokemon" width="500" height="333">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

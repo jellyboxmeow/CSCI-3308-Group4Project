@@ -10,7 +10,7 @@
                     <th class="text-end fs-4">View Collection</th>
                 </tr>
         </thead>
-        <tbody>
+        <tbody id="friendsListBody">
             {{#each friendsList}}
                 <tr>
                     <td></td>
@@ -23,9 +23,116 @@
             {{/each}}
         </tbody>
     </table>
+    {{!-- TODO: Have to update when have no friends, dynamically --}}
     {{!-- Message for if you have no friends --}}
     {{else}}
             <p>You have no friends</p>
     {{/if}}
-    <button class="btn btn-outline-secondary">+Add Friend</button>
+    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
+
+    <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="friendModalLabel">Add a New Friend</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFriendForm">
+                        <div class="mb-3">
+                            <input type="hidden" id="currentUserId" value="{{user.users_id}}">
+                            <label for="friendUsername" class="form-label">Friend's Username</label>
+                            <input type="text" class="form-control" id="friendUsername" required placeholder="Enter username">
+                        </div>
+                        <div id="error-message" class="text-danger" style="display: none;">
+                            <small>Please enter a valid username.</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="addFriendBtn">Add Friend</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+
+<script>
+    // JavaScript for handling form submission and validation
+    document.getElementById('addFriendForm').addEventListener('submit', function (event) {
+        event.preventDefault();  // Prevent the default form submission
+
+        const users_id = document.getElementById('currentUserId').value; // Get the current user's ID from the hidden input
+        const friend_username = document.getElementById('friendUsername').value; // Get the entered friend's username
+        const errorMessage = document.getElementById('error-message');
+
+        // Simple validation to check if username is empty
+        if (friend_username.trim() === '') {
+            errorMessage.style.display = 'block';
+            errorMessage.innerText = 'Please enter a valid username.';
+        } else {
+            errorMessage.style.display = 'none';
+
+            // Send the data to the server using fetch API
+            fetch('/add-friend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ users_id, friend_username }) // Sending the user ID and friend's username
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal after adding the friend successfully
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('friendModal'));
+                    modal.hide();
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.classList.add('alert', 'alert-success');
+                    successMessage.innerText = data.message || 'Friend added successfully!';
+                    document.querySelector('.container-fluid').prepend(successMessage);
+
+                    // Remove the success message after 3 seconds
+                    setTimeout(() => successMessage.remove(), 3000);
+                    console.log(data);
+
+                    // Dynamically add the new friend to the friend list
+                    //friendsListBody.innerHTML = '';
+
+                    const friendsTable = document.querySelector('tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                    <td></td>
+                    <td>${friend_username}</td>
+                    <td class="text-end">
+                        <a class="btn btn-outline-success" href="/search">View</a>
+                    </td>
+                    `;
+                    friendsTable.appendChild(newRow);
+
+
+
+                    // Optionally, reset the form fields for the next entry
+                    document.getElementById('friendUsername').value = ''; 
+
+                    // Optionally, update the friend list on the page or show a success message
+                    console.log('Friend added successfully!');
+                } else {
+                    // Show an error message if something went wrong
+                    console.error('Failed to add friend:', data.message);
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerText = data.message || 'Failed to add friend.';
+                }
+            })
+            .catch(error => {
+                console.error('Error adding friend:', error);
+            });
+        }
+    });
+</script>
