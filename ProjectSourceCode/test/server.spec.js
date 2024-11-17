@@ -166,6 +166,33 @@ describe('Friends Route API', () =>{
       expect(res).to.have.status(200);
       res.text.should.include('test');
     });
+    it('Negative: If already friends, do not add', async () => {
+      await agent.post('/login').send(userData); //John Doe's user data
+      await agent.get('/friends');
+      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'test'});
+      // console.log(addFriendres.body);
+      expect(addFriendres).to.have.status(400);
+      expect(addFriendres.body).to.have.property('success', false);
+      expect(addFriendres.body).to.have.property('message', 'You already added them');
+    });
+    it('Negative: If user does not exist, do not add', async () => {
+      await agent.post('/login').send(userData); //John Doe's user data
+      await agent.get('/friends');
+      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'cat'});
+      // console.log(addFriendres.body);
+      expect(addFriendres).to.have.status(400);
+      expect(addFriendres.body).to.have.property('success', false);
+      expect(addFriendres.body).to.have.property('message', 'Please enter a valid user');
+    });
+    it('Negative: If try to friend yourself, do not add yourself', async () => {
+      await agent.post('/login').send(userData); //John Doe's user data
+      await agent.get('/friends');
+      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'John Doe'});
+      // console.log(addFriendres.body);
+      expect(addFriendres).to.have.status(400);
+      expect(addFriendres.body).to.have.property('success', false);
+      expect(addFriendres.body).to.have.property('message', 'You can not be friends with yourself');
+    });
   });
 });
 

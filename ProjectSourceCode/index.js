@@ -137,7 +137,7 @@ app.post('/add-friend', async (req, res) => {
       //SELECT 1 is for checking if there exists any rows
     const check = await db.any(checkFriendsTable, [users_id, friend.users_id]);
     if(check.length > 0){
-      return res.status(400).json({success: false, message: 'You already added them. Reload the page'});
+      return res.status(400).json({success: false, message: 'You already added them'});
     }
     const friend_id_in_users_table = friend.users_id;
     await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
