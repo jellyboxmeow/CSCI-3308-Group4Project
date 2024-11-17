@@ -10,7 +10,10 @@
         "handlebars": "^4.7.8",
         "axios": "^1.1.3",
         "bcryptjs": "^2.4.0",
-        "pokemontcgsdk": "^2.0.0"
+        "pokemontcgsdk": "^2.0.0",
+        "sequelize": "^6.0.0",
+        "pg": "^8.7.0",       
+        "pg-hstore": "^2.3.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.7",
