@@ -52,11 +52,7 @@ describe('Testing Register API', () => {
       .send({ username: 'test', password: 'test' })  // Example input
       .end((err, res) => {
         res.should.have.status(200); // Expecting a success status code and then a redirect
-<<<<<<< HEAD
-        res.should.redirectTo(/^.*127\.0\.0\.1.*\/register$/);
-=======
         res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
->>>>>>> origin/main
         done();  // Indicate the end of this test
       });
   });
