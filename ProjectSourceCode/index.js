@@ -52,6 +52,7 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'src/views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(express.static(path.join(__dirname, '/src/resources/css')));
 
 // initialize session variables
 app.use(
@@ -97,7 +98,6 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  console.log('Session User:', req.session.user);
   if(!req.session.user){
     return res.redirect('/login');
   }
@@ -228,6 +228,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// 202a8ad93230c509e01ec1c7a926ac7c77524483
 // Authentication Middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -259,6 +260,7 @@ app.get('/home', (req, res) => {
   }
   res.render('pages/home', { user: req.session.user, error: null})
 });
+
 
 app.get('/search', (req, res) => {
   const name = req.query.search;

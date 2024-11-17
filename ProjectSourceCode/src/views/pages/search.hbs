@@ -1,16 +1,26 @@
-<div class="search_bar">'
-    <form action="/search" method="GET">
-        <label for="search">Search Pokemon:</label>
-        <input type="search" id="search" name="search">
-        <button type="submit">Search</button>
-    </form>
-
-</div>
-<div class="pokemon-cards"
-    style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 100px); row-gap: 150px;">
+<form action="/search" method="GET">
+    <label for="search">Search Pokemon:</label>
+    <input type="search" id="search" name="search">
+    <button type="submit">Search</button>
+</form>
+<div class="pokemon-cards">
     {{#each cards}}
-    <div class="card">
-        <img src="{{this.images.large}}" alt="{{this.name}}" style="width: 200px; height:auto;">
+    <div class="search_card">
+        <img class="search_image" src="{{this.images.large}}" alt="{{this.name}}">
+        <h5>{{this.name}}</h5>
+        <h5>Set: {{this.set.name}}</h5>
+        <h5>Price: {{this.cardmarket.prices.averageSellPrice}}</h5>
+        <div class="search_button">
+            <form action="/search" method="GET">
+                <input type="hidden" name="card_name" value="{{this.name}}">
+                <input type="hidden" name="card_image" value="{{this.images.large}}">
+                <input type="hidden" name="card_rarity" value="{{this.rarity}}">
+                <input type="hidden" name="card_price" value="{{this.cardmarket.prices.averageSellPrice}}">
+                <input type="hidden" name="card_set" value="{{this.set.name}}">
+                <button type="submit">Add Card</button>
+            </form>
+        </div>
     </div>
     {{/each}}
+</div>
 </div>
