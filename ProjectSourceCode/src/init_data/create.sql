@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS community_forms(
     form_name VARCHAR(255) NOT NULL,
     form_type VARCHAR(50) NOT NULL,
     form_description TEXT,
-    form_user INT NOT NULL,
-    FOREIGN KEY (form_user) REFERENCES users (users_id) ON DELETE CASCADE,
+    form_user VARCHAR(50) NOT NULL,
+    FOREIGN KEY (form_user) REFERENCES users (username) ON DELETE CASCADE,
     form_date DATE,
     form_comments_id INT NOT NULL,
     FOREIGN KEY (form_comments_id) REFERENCES form_comments (form_comments_id) ON DELETE CASCADE

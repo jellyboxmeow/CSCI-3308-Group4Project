@@ -1,1 +1,21 @@
-{{Each}}
+<div class="container my-5">
+    <div class = ""></div>
+    <div class="forms-grid">
+        {{#each forms}}
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{this.form_name}}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">{{this.form_type}}</h6>
+                <p class="card-desc">{{this.form_description}}</p>
+                <p class="card-username-date">{{this.form_user}} {{this.form_date}}</a>
+            </div>
+        </div>
+        {{/each}}
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Add Form</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">+</h6>
+            </div>
+        </div>
+    </div>
+</div>
