@@ -174,7 +174,7 @@ app.post('/register', async (req, res) => {
     const userCheckQuery = 'SELECT * FROM users WHERE username = $1';
     const existingUser = await db.oneOrNone(userCheckQuery, [username]);
     if (existingUser) {
-      return res.status(400).redirect('/register');
+      return res.status(400).redirect('/login');
     }
 
     // Insert new user into the database

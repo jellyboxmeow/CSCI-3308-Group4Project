@@ -49,7 +49,7 @@ describe('Testing Register API', () => {
     chai
       .request(server)
       .post('/register')
-      .send({ username: 'test', password: 'test' })  // Example input
+      .send({ username: 'test2', password: 'test2' })  // Example input
       .end((err, res) => {
         res.should.have.status(200); // Expecting a success status code and then a redirect
         res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
@@ -71,7 +71,7 @@ describe('Testing Register API', () => {
           .send({ username: 'John Doe', password: '20200220' })  // Same username, password shouldn't matter here
           .end((err, res) => {
             // res.should.have.status(400);  // Expect status 400 for a conflict
-            res.should.redirectTo(/^.*127\.0\.0\.1.*\/register$/); //expect a redirect 
+            res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/); //expect a redirect 
             done();
           });
       });
@@ -110,42 +110,61 @@ describe('Testing Login API', () => {
   });
 });
 
-describe('Testing Friends API', () =>{
-  it('Positive: Logged in with no friends displays no friends', done => {
-    const userData = {
-      username: 'John Doe',
-      password: '20200220',
-    };
+describe('Friends Route API', () =>{
+  let agent;
+  const userData = {
+    username: 'John Doe',
+    password: '20200220',
+  };
 
-    chai
-    .request(server)
-    .post('/login') //Logging in
-    .send(userData)
-    .end((err, res) =>{
-      if (err) return done(err);
-      // res.should.redirectTo(/^.*127\.0\.0\.1.*\/home$/);  // Check for redirect to /friends
+  beforeEach(() => {
+    // Create new agent for session handling
+    agent = chai.request.agent(server);
+  });
 
-      res.should.have.status(200); // Check that login succeeded (redirect or success)
-      // Ensure the session is set
-      // res.header['set-cookie'].should.exist; // Expect a session cookie to be set
-      const cookie = res.header['set-cookie'].join(';');  // Get session cookie
-      // console.log('Session Cookie:', cookie);  // Log cookie for debugging
-
+  afterEach(() => {
+    // Clear cookie after each test
+    agent.close();
+  });
+  
+  describe('GET /friends', ()=>{
+    it('should redirect to /login page when not logged in', done =>{
       chai
-      .request(server)
-      .get('/friends')
-      .set('Cookie', cookie)
-      .end((err, res)=>{
-        if (err) return done(err);
+        .request(server)
+        .get('/friends')
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
+          done();
+        });
+    });
+    it('Positive: Logged in with no friends displays no friends', async () => {
+      await agent.post('/login').send(userData);
+      const res = await agent.get('/friends');
+      // console.log(res);
 
-        console.log(res.text);
+      expect(res).to.have.status(200);
+      res.text.should.include('You have no friends');
+    });
+    it('Positive: Logged in with friends displays friends', async () => {
+      await agent.post('/login').send({username:'test', password:'test'});
+      const res = await agent.get('/friends');
 
-        //check the response
-        res.should.have.status(200);
-        res.text.should.include('You have no friends');
+      expect(res).to.have.status(200);
+      res.text.should.not.include('You have no friends');
+    });
+    it('Positive: Adding Friends successfully', async () => {
+      await agent.post('/login').send(userData); //John Doe's user data
+      let res = await agent.get('/friends');
+      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'test'});
+      // console.log(addFriendres);
+      expect(addFriendres).to.have.status(200);
+      await new Promise(resolve => setTimeout(resolve, 100)); //Simulates reloading the page
+      res = await agent.get('/friends');
+      // console.log(res);
 
-        done();
-      })
+      expect(res).to.have.status(200);
+      res.text.should.include('test');
     });
   });
 });
