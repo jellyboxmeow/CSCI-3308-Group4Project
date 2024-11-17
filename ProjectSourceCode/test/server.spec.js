@@ -10,6 +10,18 @@ chai.should();
 chai.use(chaiHttp);
 const {assert, expect} = chai;
 
+//For putting the db in
+// const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
+// const dbConfig = {
+//   host: 'db', // the database server
+//   port: 5432, // the database port
+//   database: process.env.POSTGRES_DB, // the database name
+//   user: process.env.POSTGRES_USER, // the user account to connect with
+//   password: process.env.POSTGRES_PASSWORD, // the password of the user account
+// };
+// const db = pgp(dbConfig);
+// const bcrypt = require('bcryptjs'); //  To hash passwords
+
 // ********************** DEFAULT WELCOME TESTCASE ****************************
 
 describe('Server!', () => {
@@ -37,10 +49,10 @@ describe('Testing Register API', () => {
     chai
       .request(server)
       .post('/register')
-      .send({ username: 'John Doe', password: '20200220' })  // Example input
+      .send({ username: 'test', password: 'test' })  // Example input
       .end((err, res) => {
         res.should.have.status(200); // Expecting a success status code and then a redirect
-        res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/register$/);
         done();  // Indicate the end of this test
       });
   });
@@ -97,5 +109,105 @@ describe('Testing Login API', () => {
     });
   });
 });
+
+describe('Testing Friends API', () =>{
+  it('Positive: Logged in with no friends displays no friends', done => {
+    const userData = {
+      username: 'John Doe',
+      password: '20200220',
+    };
+
+    chai
+    .request(server)
+    .post('/login') //Logging in
+    .send(userData)
+    .end((err, res) =>{
+      if (err) return done(err);
+      // res.should.redirectTo(/^.*127\.0\.0\.1.*\/home$/);  // Check for redirect to /friends
+
+      res.should.have.status(200); // Check that login succeeded (redirect or success)
+      // Ensure the session is set
+      // res.header['set-cookie'].should.exist; // Expect a session cookie to be set
+      const cookie = res.header['set-cookie'].join(';');  // Get session cookie
+      // console.log('Session Cookie:', cookie);  // Log cookie for debugging
+
+      chai
+      .request(server)
+      .get('/friends')
+      .set('Cookie', cookie)
+      .end((err, res)=>{
+        if (err) return done(err);
+
+        console.log(res.text);
+
+        //check the response
+        res.should.have.status(200);
+        res.text.should.include('You have no friends');
+
+        done();
+      })
+    });
+  });
+});
+
+// describe('Profile Route Tests', () => {
+//   let agent;
+//   const testUser = {
+//     username: 'testuser',
+//     password: '$2a$10$hAuKXBiEGYk1lEdc8CCO1.5KeT3YV0yxOVX6qb6Dk2TUZrh1yPo12',
+//     //testpass123
+//   };
+
+//   before(async () => {
+//     // Clear users table and create test user
+//     await db.query('TRUNCATE TABLE users CASCADE');
+//     // const hashedPassword = await bcryptjs.hash(testUser.password, 10);
+//     await db.query('INSERT INTO users (username, password) VALUES ($1, $2)', [
+//       testUser.username,
+//       testUser.password,
+//     ]);
+//   });
+
+//   beforeEach(() => {
+//     // Create new agent for session handling
+//     agent = chai.request.agent(server);
+//   });
+
+//   afterEach(() => {
+//     // Clear cookie after each test
+//     agent.close();
+//   });
+
+//   after(async () => {
+//     // Clean up database
+//     await db.query('TRUNCATE TABLE users CASCADE');
+//   });
+
+//   describe('GET /profile', () => {
+//     it('should redirect to /login page', done => {
+//       chai
+//         .request(server)
+//         .get('/profile')
+//         .end((err, res) => {
+//           expect(res).to.have.status(200);
+//           res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
+//           done();
+//         });
+//     });
+
+//     it('should return user profile when authenticated', async () => {
+//       // First login to get session
+//       await agent.post('/login').send(testUser);
+
+//       // Then access profile
+//       const res = await agent.get('/profile');
+//       console.log(res.body);
+
+//       expect(res).to.have.status(200);
+//       expect(res.body).to.be.an('object');
+//       // expect(res.session.user.username).to.have.property('username', testUser.username);
+//     });
+//   });
+// });
 
 // ********************************************************************************

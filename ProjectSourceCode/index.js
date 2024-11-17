@@ -97,6 +97,7 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
+  console.log('Session User:', req.session.user);
   if(!req.session.user){
     return res.redirect('/login');
   }
@@ -202,7 +203,7 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
       req.session.user = user; // Store user data in the session
-      req.session.save(async () => {
+      // req.session.save(async () => {
         const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
         ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
         AND users.username != $2\
@@ -213,12 +214,12 @@ app.post('/login', async (req, res) => {
         // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
         const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
         req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
-        console.log(friendsList); // checking results
-        console.log(req.session.friends); //debugging session friends
+        // console.log(friendsList); // checking results
+        // console.log(req.session.friends); //debugging session friends
         req.session.save(()=>{
           return res.status(302).redirect('/home'); // Redirect to /friends on successful login
         });
-      });// Redirect to the 'home' page after successful login
+      // });// Redirect to the 'home' page after successful login
     } else {
       return res.status(400).redirect('/login'); // Render the login page with an error message
     }
@@ -239,14 +240,23 @@ const auth = (req, res, next) => {
 app.use('/friends', auth);
 app.use('/search', auth);
 app.use('/profile', auth);
-app.use('/home', auth);
+// app.use('/home', auth);
 app.use('/logout', auth);
 
 app.get('/profile', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
+  console.log('User in session:', req.session.user);  // Debugging line
+  // console.log(res.json(req.session.user));
   res.render('pages/profile', { user: req.session.user, error: null })
 });
 
 app.get('/home', (req, res) => {
+  if (!req.session.user) {
+    // Redirect to login if somehow accessed directly without being logged in
+    return res.redirect('/login');
+  }
   res.render('pages/home', { user: req.session.user, error: null})
 });
 
