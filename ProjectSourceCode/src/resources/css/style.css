@@ -1,0 +1,16 @@
+.pokemon-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 100px);
+    row-gap: 150px;
+}
+
+.search_card {
+    display: flex;
+    flex-direction: column
+}
+
+.search_image {
+    width: 200px;
+    height: auto;
+}

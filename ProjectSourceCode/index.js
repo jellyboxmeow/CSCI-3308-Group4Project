@@ -52,6 +52,7 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'src/views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(express.static(path.join(__dirname, '/src/resources/css')));
 
 // initialize session variables
 app.use(
@@ -175,7 +176,18 @@ const auth = (req, res, next) => {
 
 app.get('/search', (req, res) => {
   const name = req.query.search;
-  console.log(name);
+  const card_name = req.query.card_name
+  const card_image = req.query.card_image
+  const card_rarity = req.query.card_rarity
+  const card_price = req.query.card_price
+  const card_set = req.query.card_set
+  console.log('Name:', name);
+  console.log('Card name: ', card_name)
+  console.log('Card image: ', card_image)
+  console.log('Card rarity: ', card_rarity)
+  console.log('Card price: ', card_price)
+  console.log('Card set: ', card_set)
+
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
@@ -184,7 +196,7 @@ app.get('/search', (req, res) => {
     }
   })
     .then(results => {
-      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      console.log(results.data);
       res.render('pages/search', { cards: results.data.data });
     })
     .catch(error => {
