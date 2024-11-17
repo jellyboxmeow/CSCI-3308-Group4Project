@@ -52,6 +52,7 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'src/views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(express.static(path.join(__dirname, '/src/resources/css')));
 
 // initialize session variables
 app.use(
@@ -227,6 +228,15 @@ app.post('/login', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+app.get('/friends', (req, res) => {
+  res.render('pages/friends', { error: null })
+});
+
+
+
+=======
+>>>>>>> 202a8ad93230c509e01ec1c7a926ac7c77524483
 // Authentication Middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
@@ -236,6 +246,22 @@ const auth = (req, res, next) => {
   next();
 };
 
+<<<<<<< HEAD
+app.get('/search', (req, res) => {
+  const name = req.query.search;
+  const card_name = req.query.card_name
+  const card_image = req.query.card_image
+  const card_rarity = req.query.card_rarity
+  const card_price = req.query.card_price
+  const card_set = req.query.card_set
+  console.log('Name:', name);
+  console.log('Card name: ', card_name)
+  console.log('Card image: ', card_image)
+  console.log('Card rarity: ', card_rarity)
+  console.log('Card price: ', card_price)
+  console.log('Card set: ', card_set)
+
+=======
 app.use('/friends', auth);
 app.use('/search', auth);
 app.use('/profile', auth);
@@ -253,6 +279,7 @@ app.get('/home', (req, res) => {
 app.get('/search', (req, res) => {
   const name = req.query.search;
   console.log(name);
+>>>>>>> 202a8ad93230c509e01ec1c7a926ac7c77524483
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
@@ -261,8 +288,13 @@ app.get('/search', (req, res) => {
     }
   })
     .then(results => {
+<<<<<<< HEAD
+      console.log(results.data);
+      res.render('pages/search', { cards: results.data.data });
+=======
       console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
       res.render('pages/search', { user: req.session.user , cards: results.data.data});
+>>>>>>> 202a8ad93230c509e01ec1c7a926ac7c77524483
     })
     .catch(error => {
       // Handle errors
