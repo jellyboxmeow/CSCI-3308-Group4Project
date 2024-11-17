@@ -243,7 +243,6 @@ app.use('/search', auth);
 app.use('/profile', auth);
 app.use('/home', auth);
 app.use('/logout', auth);
-app.use('/forms', auth);
 
 app.get('/profile', (req, res) => {
   res.render('pages/profile', { user: req.session.user, error: null })
@@ -272,18 +271,6 @@ app.get('/search', (req, res) => {
       // Handle errors
       res.status(400);
     });
-});
-
-app.get('/forms', async (req, res) => {
-  const formsQuery = 'SELECT * FROM community_forms';
-  const community_forms = await db.any(formsQuery);
-  req.session.forms = community_forms;
-  console.log(community_forms); // sending to console to test
-  res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
-});
-
-app.post('/forms/add', async(req,res) => {
-  
 });
 
 app.get('/logout', (req, res) => {
