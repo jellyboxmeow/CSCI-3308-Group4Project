@@ -1,4 +1,4 @@
---- TODO: Create a session management table, Users, Login, etc. ---
+-- Drop and recreate the `cards` table
 DROP TABLE IF EXISTS cards CASCADE;
 CREATE TABLE IF NOT EXISTS cards(
     id INT PRIMARY KEY,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS cards(
     card_set VARCHAR(255) NOT NULL
 );
 
---- TODO: Create a table for Deck value ---
+-- Drop and recreate the `deck` table
 DROP TABLE IF EXISTS deck CASCADE;
 CREATE TABLE IF NOT EXISTS deck(
     id SERIAL PRIMARY KEY,
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS deck(
     FOREIGN KEY (cards2) REFERENCES cards(id) ON DELETE CASCADE
 );
 
+-- Drop and recreate the `users` table
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users(
     users_id SERIAL PRIMARY KEY,
@@ -29,16 +30,15 @@ CREATE TABLE IF NOT EXISTS users(
     FOREIGN KEY (deck_id) REFERENCES deck(id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS form_comments CASCADE;
-CREATE TABLE IF NOT EXISTS form_comments(
-    form_comments_id INT PRIMARY KEY,
-    -- form_id INT FOREIGN KEY,
-    content TEXT,
-    comment_date DATE
-    -- comment_user FOREIGN KEY
-);
- 
----TODO: Create a table for friends ---
+-- -- Drop and recreate the `form_comments` table
+-- DROP TABLE IF EXISTS form_comments CASCADE;
+-- CREATE TABLE IF NOT EXISTS form_comments(
+--     form_comments_id INT PRIMARY KEY,
+--     content TEXT,
+--     comment_date DATE
+-- );
+
+-- Drop and recreate the `friends` table
 DROP TABLE IF EXISTS friends CASCADE;
 CREATE TABLE IF NOT EXISTS friends(
     user_id INT NOT NULL,
@@ -49,15 +49,15 @@ CREATE TABLE IF NOT EXISTS friends(
 
 ALTER TABLE friends ADD CONSTRAINT unique_friendship UNIQUE (user_id, friend_id);
 
---- TODO: Create table(s) for Community Forms ---
+-- Drop and recreate the `community_forms` table with `form_user` referencing `username`
 DROP TABLE IF EXISTS community_forms CASCADE;
 CREATE TABLE IF NOT EXISTS community_forms(
     community_forms_id INT PRIMARY KEY,
     form_name VARCHAR(255) NOT NULL,
     form_type VARCHAR(50) NOT NULL,
     form_description TEXT,
-    form_user INT NOT NULL,
-    FOREIGN KEY (form_user) REFERENCES users (users_id) ON DELETE CASCADE,
+    form_user VARCHAR(50) NOT NULL,
+    FOREIGN KEY (form_user) REFERENCES users (username) ON DELETE CASCADE,
     form_date DATE,
     form_comments_id INT NOT NULL,
     FOREIGN KEY (form_comments_id) REFERENCES form_comments (form_comments_id) ON DELETE CASCADE
