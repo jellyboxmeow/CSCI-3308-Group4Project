@@ -1,6 +1,6 @@
 -- INSERT test cards --
-INSERT INTO cards(id, card_name, card_image, card_rarity, card_price, card_set) VALUES (1, 'test-charizard', 'cat.png', 'epic', 20.32, 'base');
-INSERT INTO cards(id, card_name, card_image, card_rarity, card_price, card_set) VALUES (2, 'test-squirtle', 'dog.png', 'rare', 0.34, 'base');
+INSERT INTO cards(id, card_name, card_image, card_rarity, card_price, card_set) VALUES (1, 'Pikachu', 'https://images.pokemontcg.io/basep/1_hires.png', 'Promo', 10.76, 'Wizards Black Star Promos');
+INSERT INTO cards(id, card_name, card_image, card_rarity, card_price, card_set) VALUES (2, 'Pikachu', 'https://images.pokemontcg.io/mcd19/6_hires.png', 'N/As', 5.27, 'McDonalds Collection 2019');
 
 -- INSERT test deck --
 INSERT INTO deck(cards, cards2) VALUES (1, 2);
