@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS deck(
     deck_id VARCHAR(255) PRIMARY KEY
 );
 
-<<<<<<< HEAD
 DROP TABLE IF EXISTS deck_cards CASCADE;
 CREATE TABLE IF NOT EXISTS deck_cards(
     deck_id VARCHAR(255) NOT NULL,
@@ -25,9 +24,6 @@ CREATE TABLE IF NOT EXISTS deck_cards(
 );
 
 
-=======
--- Drop and recreate the `users` table
->>>>>>> origin/main
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users(
     users_id SERIAL PRIMARY KEY,
