@@ -1,7 +1,7 @@
 --- TODO: Create a session management table, Users, Login, etc. ---
 DROP TABLE IF EXISTS cards CASCADE;
 CREATE TABLE IF NOT EXISTS cards(
-    id INT PRIMARY KEY,
+    id VARCHAR(25) PRIMARY KEY,
     card_name VARCHAR(255) NOT NULL,
     card_image VARCHAR(255) NOT NULL,
     card_rarity VARCHAR(50) NOT NULL,
@@ -12,12 +12,17 @@ CREATE TABLE IF NOT EXISTS cards(
 --- TODO: Create a table for Deck value ---
 DROP TABLE IF EXISTS deck CASCADE;
 CREATE TABLE IF NOT EXISTS deck(
-    id SERIAL PRIMARY KEY,
-    cards INT,
-    FOREIGN KEY (cards) REFERENCES cards(id) ON DELETE CASCADE,
-    cards2 INT,
-    FOREIGN KEY (cards2) REFERENCES cards(id) ON DELETE CASCADE
+    deck_id VARCHAR(255) PRIMARY KEY
 );
+
+DROP TABLE IF EXISTS deck_cards CASCADE;
+CREATE TABLE IF NOT EXISTS deck_cards(
+    deck_id VARCHAR(255) NOT NULL,
+    card_id VARCHAR(25) NOT NULL,
+    FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
+    FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
+);
+
 
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users(
@@ -25,8 +30,8 @@ CREATE TABLE IF NOT EXISTS users(
     username VARCHAR(50) NOT NULL UNIQUE,
     password CHAR(60) NOT NULL,
     status VARCHAR(50),
-    deck_id INT,
-    FOREIGN KEY (deck_id) REFERENCES deck(id) ON DELETE CASCADE
+    deck_id VARCHAR(255),
+    FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS form_comments CASCADE;

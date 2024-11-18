@@ -244,14 +244,32 @@ app.use('/profile', auth);
 // app.use('/home', auth);
 app.use('/logout', auth);
 
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');  // Redirect if there's no user in session
   }
   console.log('User in session:', req.session.user);  // Debugging line
   // console.log(res.json(req.session.user));
-  res.render('pages/profile', { user: req.session.user, error: null })
+  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const cards = await db.any(query, [req.session.user.username]);
+  console.log('cards: ', cards)
+  res.render('pages/profile', { user: req.session.user, cards: cards, error: null })
 });
+
+app.post('/add-deck', async (req, res) => {
+  const deck_id = req.body.deck_name
+  const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
+  await db.none(deck_query, [deck_id]);
+  const user = req.session.user.username
+  console.log('username: ', user)
+  const query = 'UPDATE users SET deck_id = $1 WHERE username = $2'
+  console.log('test1')
+  await db.none(query, [deck_id, user]);
+  console.log('test2')
+  req.session.user.deck_id = deck_id
+  console.log('User in session:', req.session.user);
+  res.redirect('/profile')
+})
 
 app.get('/home', (req, res) => {
   if (!req.session.user) {
@@ -261,20 +279,11 @@ app.get('/home', (req, res) => {
   res.render('pages/home', { user: req.session.user, error: null })
 });
 
+app.post('/add-deck', async (req, res) => {
 
-app.get('/search', (req, res) => {
+})
+app.get('/search', async (req, res) => {
   const name = req.query.search;
-  const card_name = req.query.card_name
-  const card_image = req.query.card_image
-  const card_rarity = req.query.card_rarity
-  const card_price = req.query.card_price
-  const card_set = req.query.card_set
-  console.log('Name:', name);
-  console.log('Card name: ', card_name)
-  console.log('Card image: ', card_image)
-  console.log('Card rarity: ', card_rarity)
-  console.log('Card price: ', card_price)
-  console.log('Card set: ', card_set)
 
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
@@ -284,13 +293,35 @@ app.get('/search', (req, res) => {
     }
   })
     .then(results => {
-      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      //console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
       res.render('pages/search', { user: req.session.user, cards: results.data.data });
     })
     .catch(error => {
       // Handle errors
       res.status(400);
     });
+});
+
+app.post('/add-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const card_name = req.body.card_name
+  const card_image = req.body.card_image
+  const card_rarity = req.body.card_rarity
+  const card_price = req.body.card_price
+  const card_set = req.body.card_set
+  console.log('Card id: ', card_id)
+  console.log('Card name: ', card_name)
+  console.log('Card image: ', card_image)
+  console.log('Card rarity: ', card_rarity)
+  console.log('Card price: ', card_price)
+  console.log('Card set: ', card_set)
+  console.log('Deck id: ', req.session.user.deck_id)
+  const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
+  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set]);
+  const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
+  await db.none(query2, [req.session.user.deck_id, card_id]);
+
+  res.redirect('/profile')
 });
 
 app.get('/logout', (req, res) => {
