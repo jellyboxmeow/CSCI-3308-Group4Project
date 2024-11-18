@@ -98,22 +98,22 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/friends', (req, res) => {
-  if(!req.session.user){
+  if (!req.session.user) {
     return res.redirect('/login');
   }
-  else{
-    res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || []})
+  else {
+    res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || [] })
   }
 });
 
 //Need to add can add yourself to your own friends list
 app.post('/add-friend', async (req, res) => {
-  const {users_id, friend_username} = req.body;
-  if(!users_id || !friend_username){
-    if(!users_id && !friend_username){
+  const { users_id, friend_username } = req.body;
+  if (!users_id || !friend_username) {
+    if (!users_id && !friend_username) {
       return res.status(400).json({ success: false, message: 'users_id and friendUsername not passed' });
     }
-    else if(!users_id){
+    else if (!users_id) {
       return res.status(400).json({ success: false, message: 'users_id not passed' });
     }
     return res.status(400).json({ success: false, message: 'friend_username not passed' });
@@ -121,23 +121,23 @@ app.post('/add-friend', async (req, res) => {
 
   // console.log('Current User ID:', users_id);
   // console.log('Friend Username:', friend_username);
-  try{
+  try {
     const friendQuery = 'SELECT users_id FROM users WHERE username = $1';
     const friend = await db.oneOrNone(friendQuery, [friend_username]);
-    if(!friend){
-      return res.status(400).json({success: false, message: 'Please enter a valid user'});
+    if (!friend) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid user' });
     }
     //checking for if someone put themselves as a friend
-    if(friend.users_id == users_id){
-      return res.status(400).json({success: false, message: 'You can not be friends with yourself'});
+    if (friend.users_id == users_id) {
+      return res.status(400).json({ success: false, message: 'You can not be friends with yourself' });
     }
 
     //have check for if already friends
     const checkFriendsTable = 'SELECT 1 FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)';
-      //SELECT 1 is for checking if there exists any rows
+    //SELECT 1 is for checking if there exists any rows
     const check = await db.any(checkFriendsTable, [users_id, friend.users_id]);
-    if(check.length > 0){
-      return res.status(400).json({success: false, message: 'You already added them'});
+    if (check.length > 0) {
+      return res.status(400).json({ success: false, message: 'You already added them' });
     }
     const friend_id_in_users_table = friend.users_id;
     await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
@@ -147,11 +147,11 @@ app.post('/add-friend', async (req, res) => {
 
     req.session.friends = friendsList.map(friend => friend.username);
 
-    return res.status(200).json({success: true, message: 'Friend added successfuly. Reload the page if you do not see them'});
+    return res.status(200).json({ success: true, message: 'Friend added successfuly. Reload the page if you do not see them' });
     // return res.redirect('/friends');
-  }catch (err){
+  } catch (err) {
     console.error(err);
-    return res.status(500).json({success: false, message: err.message || err});
+    return res.status(500).json({ success: false, message: err.message || err });
   }
   // return res.status(200).json({ success: true, message: 'Friend added successfully' });
 });
@@ -204,21 +204,21 @@ app.post('/login', async (req, res) => {
     if (match) {
       req.session.user = user; // Store user data in the session
       // req.session.save(async () => {
-        const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
+      const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
         ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
         AND users.username != $2\
         UNION \
         SELECT users.username FROM friends INNER JOIN users ON \
         users.users_id = friends.user_id WHERE friends.friend_id = $1 \
         AND users.username != $2;';
-        // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
-        const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
-        req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
-        // console.log(friendsList); // checking results
-        // console.log(req.session.friends); //debugging session friends
-        req.session.save(()=>{
-          return res.status(302).redirect('/home'); // Redirect to /friends on successful login
-        });
+      // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
+      const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
+      req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
+      // console.log(friendsList); // checking results
+      // console.log(req.session.friends); //debugging session friends
+      req.session.save(() => {
+        return res.status(302).redirect('/home'); // Redirect to /friends on successful login
+      });
       // });// Redirect to the 'home' page after successful login
     } else {
       return res.status(400).redirect('/login'); // Render the login page with an error message
@@ -245,27 +245,47 @@ app.use('/profile', auth);
 app.use('/logout', auth);
 app.use('/forms', auth);
 
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');  // Redirect if there's no user in session
   }
   console.log('User in session:', req.session.user);  // Debugging line
   // console.log(res.json(req.session.user));
-  res.render('pages/profile', { user: req.session.user, error: null })
+  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const cards = await db.any(query, [req.session.user.username]);
+  console.log('cards: ', cards)
+  res.render('pages/profile', { user: req.session.user, cards: cards, error: null })
 });
+
+app.post('/add-deck', async (req, res) => {
+  const deck_id = req.body.deck_name
+  const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
+  await db.none(deck_query, [deck_id]);
+  const user = req.session.user.username
+  console.log('username: ', user)
+  const query = 'UPDATE users SET deck_id = $1 WHERE username = $2'
+  console.log('test1')
+  await db.none(query, [deck_id, user]);
+  console.log('test2')
+  req.session.user.deck_id = deck_id
+  console.log('User in session:', req.session.user);
+  res.redirect('/profile')
+})
 
 app.get('/home', (req, res) => {
   if (!req.session.user) {
     // Redirect to login if somehow accessed directly without being logged in
     return res.redirect('/login');
   }
-  res.render('pages/home', { user: req.session.user, error: null})
+  res.render('pages/home', { user: req.session.user, error: null })
 });
 
+app.post('/add-deck', async (req, res) => {
 
-app.get('/search', (req, res) => {
+})
+app.get('/search', async (req, res) => {
   const name = req.query.search;
-  console.log(name);
+
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
@@ -274,8 +294,8 @@ app.get('/search', (req, res) => {
     }
   })
     .then(results => {
-      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/search', { user: req.session.user , cards: results.data.data});
+      //console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      res.render('pages/search', { user: req.session.user, cards: results.data.data });
     })
     .catch(error => {
       // Handle errors
@@ -283,16 +303,26 @@ app.get('/search', (req, res) => {
     });
 });
 
-app.get('/forms', async (req, res) => {
-  const formsQuery = 'SELECT * FROM community_forms';
-  const community_forms = await db.any(formsQuery);
-  req.session.forms = community_forms;
-  console.log(community_forms); // sending to console to test
-  res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
-});
+app.post('/add-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const card_name = req.body.card_name
+  const card_image = req.body.card_image
+  const card_rarity = req.body.card_rarity
+  const card_price = req.body.card_price
+  const card_set = req.body.card_set
+  console.log('Card id: ', card_id)
+  console.log('Card name: ', card_name)
+  console.log('Card image: ', card_image)
+  console.log('Card rarity: ', card_rarity)
+  console.log('Card price: ', card_price)
+  console.log('Card set: ', card_set)
+  console.log('Deck id: ', req.session.user.deck_id)
+  const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
+  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set]);
+  const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
+  await db.none(query2, [req.session.user.deck_id, card_id]);
 
-app.post('/forms/add', async(req,res) => {
-  
+  res.redirect('/profile')
 });
 
 app.get('/logout', (req, res) => {
