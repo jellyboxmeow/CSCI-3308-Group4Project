@@ -1,1 +1,85 @@
-<h1>PROFILE</h1>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <style>
+        body {
+            margin: 20px;
+            padding: 0;
+            text-align: center;
+        }
+
+        img {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .username {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .card-collection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .card-title {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img src="https://cdn0.iconfinder.com/data/icons/avatar-profile/452/pikachu_pokemon_profile_avatar_people-512.png"
+            alt="profile">
+        <div class="profile-info">
+            <h2>Username: {{user.username}}</h2>
+            <h3>Your Deck of Cards</h3>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {{#each deck}}
+            <div class="col">
+                <div class="card h-100">
+                    <!-- Card Image -->
+                    {{#if this.card_image}}
+                    <img src="{{this.card_image}}" class="card-img-top" alt="{{this.card_name}}"
+                        style="height: 370px; object-fit: cover;">
+                    {{else}}
+                    <img src="https://i.pinimg.com/originals/0c/f9/4e/0cf94e9e8d8ea25c541a69fca50f804c.jpg"
+                        class="card-img-top" alt="Default image" style="height: 370px; object-fit: cover;">
+                    {{/if}}
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.card_name}}</h5>
+                        <p class="card-text">
+                            <strong>Rarity:</strong> {{this.card_rarity}}<br>
+                            <strong>Price:</strong> ${{this.card_price}}<br>
+                            <strong>Set:</strong> {{this.card_set}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+
+
+</html>
