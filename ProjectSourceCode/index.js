@@ -286,6 +286,9 @@ app.get('/profile', async (req, res) => {
 });
 
 app.post('/add-deck', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
   const deck_id = req.body.deck_name
   const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
   await db.none(deck_query, [deck_id]);
