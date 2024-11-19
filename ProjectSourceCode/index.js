@@ -303,6 +303,18 @@ app.get('/search', async (req, res) => {
     });
 });
 
+app.get('/forms', async (req, res) => {
+  const formsQuery = 'SELECT * FROM community_forms';
+  const community_forms = await db.any(formsQuery);
+  req.session.forms = community_forms;
+  console.log(community_forms); // sending to console to test
+  res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
+});
+
+app.post('/forms/add', async(req,res) => {
+
+});
+
 app.post('/add-card', async (req, res) => {
   const card_id = req.body.card_id
   const card_name = req.body.card_name
@@ -322,7 +334,7 @@ app.post('/add-card', async (req, res) => {
   const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
   await db.none(query2, [req.session.user.deck_id, card_id]);
 
-  res.redirect('/profile')
+  res.redirect('/profile');
 });
 
 app.get('/logout', (req, res) => {

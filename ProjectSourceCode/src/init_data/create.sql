@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS deck_cards(
     FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
 );
 
-
+-- Drop and recreate the `users` table
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users(
     users_id SERIAL PRIMARY KEY,
