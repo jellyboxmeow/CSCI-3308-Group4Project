@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Achievements</title>
+</head>
+<body>
+    <h1>Manage Achievements</h1>
+    <form action="/admin/achievements" method="POST">
+        <label for="title">Achievement Title:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <button type="submit">Add Achievement</button>
+    </form>
+
+    <h2>Existing Achievements</h2>
+    <ul>
+        {{#each achievements}}
+        <li>
+            <strong>{{this.title}}</strong>: {{this.description}}
+            <form action="/admin/achievements/edit/{{this.id}}" method="POST" style="display:inline;">
+                <input type="text" name="title" value="{{this.title}}" required>
+                <input type="text" name="description" value="{{this.description}}" required>
+                <button type="submit">Edit</button>
+            </form>
+            <form action="/admin/achievements/delete/{{this.id}}" method="POST" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+        {{/each}}
+    </ul>
+</body>
+</html>

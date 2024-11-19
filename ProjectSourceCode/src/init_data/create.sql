@@ -62,3 +62,13 @@ CREATE TABLE IF NOT EXISTS community_forms(
     form_comments_id INT NOT NULL,
     FOREIGN KEY (form_comments_id) REFERENCES form_comments (form_comments_id) ON DELETE CASCADE
 );
+CREATE TABLE achievements (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL
+);
+CREATE TABLE guides (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL
+);

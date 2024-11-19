@@ -18,6 +18,11 @@
                     <!-- TODO: For regist, add a <a> tag with an attribute href to call the '/register API -->
                     <a class="nav-link" href="/register">Register</a>
                 </div>
+                    <li class="nav-item">
+                        {{#if user.isAdmin}}
+                              <a class="nav-link" href="/admin/home">Admin</a>
+                         {{/if}}
+                    </li>
             </div>
         </div>
     </nav>
