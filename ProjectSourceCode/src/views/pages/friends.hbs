@@ -43,7 +43,18 @@
                             <input type="hidden" id="currentUserId" value="{{user.users_id}}">
                             <label for="friendUsername" class="form-label">Friend's Username</label>
                             <input type="text" class="form-control" id="friendUsername" required placeholder="Enter username">
+                            <!-- Unfriended Users List -->
+                            <div class="overflow-auto" style="max-height: 200px;">
+                                <ul id="unfriendedList" class="list-group">
+                                    {{#each unfriendedList}}
+                                        <li class="list-group-item">
+                                            <label for="friend-{{this}}">{{this}}</label>
+                                        </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
                         </div>
+
                         <div id="error-message" class="text-danger" style="display: none;">
                             <small>This is where messages go</small>
                         </div>

@@ -101,13 +101,42 @@ app.get('/friends', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  else {
-    // const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
-    // const friendsList = await db.any(updatedFriendsQuery, [req.session.user.users_id]);
+  try{
+    const userId = req.session.user.users_id;
+    const username = req.session.user.username;
+    // Fetch list of users that are friends
+    const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
+      ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
+      AND users.username != $2\
+      UNION \
+      SELECT users.username FROM friends INNER JOIN users ON \
+      users.users_id = friends.user_id WHERE friends.friend_id = $1 \
+      AND users.username != $2;';
+    const friendsList = await db.any(friendsListQuery, [userId, username]);
+    req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames
 
-    // req.session.friends = friendsList.map(friend => friend.username);
+    // Fetch list of users who are not friends
+    const unfriendedQuery = `SELECT username FROM users\
+      WHERE users_id != $1\
+      AND users_id NOT IN (\
+        SELECT friend_id FROM friends WHERE user_id = $1\
+        UNION\
+        SELECT user_id FROM friends WHERE friend_id = $1\
+      );`;
+    const unfriendedList = await db.any(unfriendedQuery, [userId]);
+    req.session.unfriendedList = unfriendedList.map(user => user.username);
+
     console.log(req.session.friends);
-    res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || [] })
+
+    res.render('pages/friends', { 
+      user: req.session.user, 
+      error: null,
+      friendsList: req.session.friends || [],
+      unfriendedList:  req.session.unfriendedList || []
+    });
+  }catch{
+    console.error(err);
+    res.status(500).render('pages/friends', { error: 'An error occurred while fetching friends data.' });
   }
 });
 
@@ -213,17 +242,6 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if (match) {
       req.session.user = user; // Store user data in the session
-      // req.session.save(async () => {
-      const friendsListQuery = 'SELECT users.username FROM friends INNER JOIN users \
-        ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
-        AND users.username != $2\
-        UNION \
-        SELECT users.username FROM friends INNER JOIN users ON \
-        users.users_id = friends.user_id WHERE friends.friend_id = $1 \
-        AND users.username != $2;';
-      // const friendsListQuery = 'SELECT username FROM users WHERE users_id != $1';
-      const friendsList = await db.any(friendsListQuery, [user.users_id, user.username]);
-      req.session.friends = friendsList.map(friend => friend.username); // Extract only the usernames;
       // console.log(friendsList); // checking results
       // console.log(req.session.friends); //debugging session friends
       req.session.save(() => {
