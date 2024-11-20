@@ -97,11 +97,16 @@ app.get('/register', (req, res) => {
   res.render('pages/register', { error: null })
 });
 
-app.get('/friends', (req, res) => {
+app.get('/friends', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
   }
   else {
+    // const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
+    // const friendsList = await db.any(updatedFriendsQuery, [req.session.user.users_id]);
+
+    // req.session.friends = friendsList.map(friend => friend.username);
+    console.log(req.session.friends);
     res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || [] })
   }
 });
@@ -142,7 +147,12 @@ app.post('/add-friend', async (req, res) => {
     const friend_id_in_users_table = friend.users_id;
     await db.none('INSERT INTO friends(user_id, friend_id) VALUES ($1, $2)', [users_id, friend_id_in_users_table]);
 
-    const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
+    // const updatedFriendsQuery = 'SELECT u.username FROM users u JOIN friends f on f.friend_id = u.users_id WHERE f.user_id = $1';
+    const updatedFriendsQuery = 'SELECT users.username FROM friends INNER JOIN users \
+        ON users.users_id = friends.friend_id WHERE friends.user_id = $1 \
+        UNION \
+        SELECT users.username FROM friends INNER JOIN users ON \
+        users.users_id = friends.user_id WHERE friends.friend_id = $1;';
     const friendsList = await db.any(updatedFriendsQuery, [users_id]);
 
     req.session.friends = friendsList.map(friend => friend.username);
