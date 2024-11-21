@@ -24,7 +24,7 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-  host: 'dpg-csvn245ds78s73enh0d0-a', // the database server
+  host: process.env.HOST, // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
