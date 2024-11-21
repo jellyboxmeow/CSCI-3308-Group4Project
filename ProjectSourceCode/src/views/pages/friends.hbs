@@ -28,6 +28,8 @@
     {{else}}
             <p>You have no friends</p>
     {{/if}}
+
+
     <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
 
     <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
@@ -45,6 +47,9 @@
                             <input type="text" class="form-control" id="friendUsername" required placeholder="Enter username">
                             <!-- Unfriended Users List -->
                             <div class="overflow-auto" style="max-height: 200px;">
+                                <div>
+                                    <small>Users you could be friends with:</small>
+                                </div>
                                 <ul id="unfriendedList" class="list-group">
                                     {{#each unfriendedList}}
                                         <li class="list-group-item">
