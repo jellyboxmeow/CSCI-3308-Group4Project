@@ -8,7 +8,7 @@ const chai = require('chai'); // Chai HTTP provides an interface for live integr
 const chaiHttp = require('chai-http');
 chai.should();
 chai.use(chaiHttp);
-const {assert, expect} = chai;
+const { assert, expect } = chai;
 
 //For putting the db in
 // const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
@@ -44,7 +44,7 @@ describe('Server!', () => {
 describe('Testing Register API', () => {
 
   it('positive : /register and should redirect to /login', done => {
-    
+
     // Send a POST request with a valid username and password
     chai
       .request(server)
@@ -87,14 +87,14 @@ describe('Testing Login API', () => {
 
     // Send a POST request with a valid username and password
     chai
-    .request(server)
-    .post('/login')
-    .send(userData)  // Example input
-    .end((err, res) => {
-      res.should.have.status(200); // Expecting a success status code and then a redirect
-      res.should.redirectTo(/^.*127\.0\.0\.1.*\/home$/);
-      done();  // Indicate the end of this test
-    });
+      .request(server)
+      .post('/login')
+      .send(userData)  // Example input
+      .end((err, res) => {
+        res.should.have.status(200); // Expecting a success status code and then a redirect
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/home$/);
+        done();  // Indicate the end of this test
+      });
   });
   it('Negative : /login. If user is not in database login redirect to register page', done => {
     // Send a POST request with a valid username and password
@@ -106,11 +106,11 @@ describe('Testing Login API', () => {
         res.should.have.status(200); // Expecting a success status code and then a redirect
         res.should.redirectTo(/^.*127\.0\.0\.1.*\/register$/);
         done();  // Indicate the end of this test
-    });
+      });
   });
 });
 
-describe('Friends Route API', () =>{
+describe('Friends Route API', () => {
   let agent;
   const userData = {
     username: 'John Doe',
@@ -126,9 +126,9 @@ describe('Friends Route API', () =>{
     // Clear cookie after each test
     agent.close();
   });
-  
-  describe('GET /friends', ()=>{
-    it('should redirect to /login page when not logged in', done =>{
+
+  describe('GET /friends', () => {
+    it('should redirect to /login page when not logged in', done => {
       chai
         .request(server)
         .get('/friends')
@@ -147,7 +147,7 @@ describe('Friends Route API', () =>{
       res.text.should.include('You have no friends');
     });
     it('Positive: Logged in with friends displays friends', async () => {
-      await agent.post('/login').send({username:'test', password:'test'});
+      await agent.post('/login').send({ username: 'test', password: 'test' });
       const res = await agent.get('/friends');
 
       expect(res).to.have.status(200);
@@ -156,7 +156,7 @@ describe('Friends Route API', () =>{
     it('Positive: Adding Friends successfully', async () => {
       await agent.post('/login').send(userData); //John Doe's user data
       let res = await agent.get('/friends');
-      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'test'});
+      const addFriendres = await agent.post('/add-friend').send({ users_id: 4, friend_username: 'test' });
       // console.log(addFriendres);
       expect(addFriendres).to.have.status(200);
       await new Promise(resolve => setTimeout(resolve, 100)); //Simulates reloading the page
@@ -169,7 +169,7 @@ describe('Friends Route API', () =>{
     it('Negative: If already friends, do not add', async () => {
       await agent.post('/login').send(userData); //John Doe's user data
       await agent.get('/friends');
-      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'test'});
+      const addFriendres = await agent.post('/add-friend').send({ users_id: 4, friend_username: 'test' });
       // console.log(addFriendres.body);
       expect(addFriendres).to.have.status(400);
       expect(addFriendres.body).to.have.property('success', false);
@@ -178,7 +178,7 @@ describe('Friends Route API', () =>{
     it('Negative: If user does not exist, do not add', async () => {
       await agent.post('/login').send(userData); //John Doe's user data
       await agent.get('/friends');
-      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'cat'});
+      const addFriendres = await agent.post('/add-friend').send({ users_id: 4, friend_username: 'cat' });
       // console.log(addFriendres.body);
       expect(addFriendres).to.have.status(400);
       expect(addFriendres.body).to.have.property('success', false);
@@ -187,7 +187,7 @@ describe('Friends Route API', () =>{
     it('Negative: If try to friend yourself, do not add yourself', async () => {
       await agent.post('/login').send(userData); //John Doe's user data
       await agent.get('/friends');
-      const addFriendres = await agent.post('/add-friend').send({users_id:4, friend_username:'John Doe'});
+      const addFriendres = await agent.post('/add-friend').send({ users_id: 4, friend_username: 'John Doe' });
       // console.log(addFriendres.body);
       expect(addFriendres).to.have.status(400);
       expect(addFriendres.body).to.have.property('success', false);

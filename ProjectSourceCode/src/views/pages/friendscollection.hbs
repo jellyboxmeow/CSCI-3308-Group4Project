@@ -56,6 +56,7 @@
         .flip-card-inner {
             animation-name: flip;
             animation-duration: 0.7s;
+            animation-delay: .3s;
             animation-fill-mode: forwards;
         }
 
@@ -82,7 +83,7 @@
         <img src="https://cdn0.iconfinder.com/data/icons/avatar-profile/452/pikachu_pokemon_profile_avatar_people-512.png"
             alt="profile" class="profile_img">
         <div class="profile-info">
-            <h2>Username: {{user.username}}</h2>
+            <h2>Username: {{user}}</h2>
             <h3>Your Deck of Cards</h3>
             {{#each price}}
             <h3>Value of your deck: {{sum}}$</h3>
@@ -91,21 +92,11 @@
         <div style="display: flex; justify-content: center; margin-top: 50px; padding-bottom: 100px">
             <div class="pokemon-cards"
                 style="display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 50px; column-gap: 150px;">
-                <script>
-                    let count = 1
-                </script>
                 {{#each cards}}
-                <script>
-                    var delay = .3 * count
-                    count++
-                    console.log(delay)
-                    const element = document.getElementById('flip-card-inner')
-                    element.style.animationDelay = delay"s"
-                </script>
                 <div class="search_card" style="display: flex; flex-direction: column">
                     <div class="flip-card">
-                        <div class="flip-card-inner" id="flip-card-inner">
-                            <div class=" flip-card-front">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
                                 <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4f7705ec-8c49-4eed-a56e-c21f3985254c/dah43cy-a8e121cb-934a-40f6-97c7-fa2d77130dd5.png/v1/fit/w_828,h_1148/pokemon_card_backside_in_high_resolution_by_atomicmonkeytcg_dah43cy-414w-2x.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTQyMCIsInBhdGgiOiJcL2ZcLzRmNzcwNWVjLThjNDktNGVlZC1hNTZlLWMyMWYzOTg1MjU0Y1wvZGFoNDNjeS1hOGUxMjFjYi05MzRhLTQwZjYtOTdjNy1mYTJkNzcxMzBkZDUucG5nIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.9GzaYS7sd8RPY5FlHca09J9ZQZ9D9zI69Ru-BsbkLDA"
                                     alt="Avatar" style="width: 250px; height: auto;">
                             </div>
@@ -113,26 +104,17 @@
                                 <img src="{{this.card_image}}" alt="{{this.card_name}}"
                                     style="width: 250px; height: auto;">"
                             </div>
+                            <script>console.log({{../ deck_id }})</script>
                         </div>
                     </div>
                     <div>
                         <h5>{{this.card_name}}</h5>
                         <h5>Set: {{this.card_set}}</h5>
                         <h5>Price: {{this.card_price}}</h5>
-                        <form action="/trade-card" method="POST" style="display: {{../display}}; margin-bottom: 15px">
+                        <form action="/friend-trade-card" method="POST" style="display: {{../display}};">
                             <input type="hidden" name="card_id" value="{{this.id}}">
-                            <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
+                            <input type="hidden" name="deck_id" value="{{../deck_id.deck_id}}">
                             <button type="submit">Trade Card</button>
-                        </form>
-                        <form action="/remove-card" method="POST" style="display: {{../display}};">
-                            <input type="hidden" name="card_id" value="{{this.id}}">
-                            <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
-                            <button type="submit">Remove card</button>
-                        </form>
-                        <form action="/cancel-trade" method="POST" style="display: {{../opp_display}};">
-                            <input type="hidden" name="card_id" value="{{this.id}}">
-                            <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
-                            <button type="submit">Cancel Trade</button>
                         </form>
                     </div>
                 </div>

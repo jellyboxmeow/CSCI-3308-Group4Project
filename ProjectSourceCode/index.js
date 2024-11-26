@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const { exists } = require('fs');
 
 
 // *****************************************************
@@ -21,6 +22,7 @@ const hbs = handlebars.create({
   layoutsDir: __dirname + '/src/views/layouts',
   partialsDir: __dirname + '/src/views/partials',
 });
+
 
 // database configuration
 const dbConfig = {
@@ -102,6 +104,7 @@ app.get('/friends', (req, res) => {
     return res.redirect('/login');
   }
   else {
+    console.log(req.session.friends)
     res.render('pages/friends', { user: req.session.user, error: null, friendsList: req.session.friends || [] })
   }
 });
@@ -177,9 +180,12 @@ app.post('/register', async (req, res) => {
       return res.status(400).redirect('/login');
     }
 
+    const queryDeck = 'INSERT INTO deck DEFAULT VALUES RETURNING deck_id'
+    await db.one(queryDeck)
+
     // Insert new user into the database
-    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2)';
-    await db.none(queryText, [username, hash]);
+    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING deck_id';
+    await db.one(queryText, [username, hash]);
 
     // Respond with success message
     // res.status(200).json({ message: 'Success' });
@@ -251,26 +257,57 @@ app.get('/profile', async (req, res) => {
   }
   console.log('User in session:', req.session.user);  // Debugging line
   // console.log(res.json(req.session.user));
+  const query_exists = 'SELECT COUNT(*) from trade_cards'
+  const exists = await db.one(query_exists)
+  var button
+  var opp_button
+  if (exists.count == 0) {
+    button = 'block'
+    opp_button = 'none'
+  }
+  else {
+    button = 'none'
+    opp_button = 'block'
+  }
+  console.log('Display method: ', button)
   const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
   const cards = await db.any(query, [req.session.user.username]);
-  console.log('cards: ', cards)
-  res.render('pages/profile', { user: req.session.user, cards: cards, error: null })
+  const queryprice = 'SELECT SUM(cards.card_price) from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const price = await db.any(queryprice, [req.session.user.username]);
+  // console.log('price: ', price)
+  // console.log('cards: ', cards)
+  res.render('pages/profile', { user: req.session.user, cards: cards, price: price, error: null, display: button, opp_display: opp_button })
 });
 
-app.post('/add-deck', async (req, res) => {
-  const deck_id = req.body.deck_name
-  const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
-  await db.none(deck_query, [deck_id]);
-  const user = req.session.user.username
-  console.log('username: ', user)
-  const query = 'UPDATE users SET deck_id = $1 WHERE username = $2'
-  console.log('test1')
-  await db.none(query, [deck_id, user]);
-  console.log('test2')
-  req.session.user.deck_id = deck_id
-  console.log('User in session:', req.session.user);
-  res.redirect('/profile')
-})
+app.get('/friendscollection', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
+  const query_exists = 'SELECT COUNT(*) from trade_cards'
+  const exists = await db.one(query_exists)
+  var button
+  if (exists.count == 0) {
+    button = 'none'
+  }
+  else {
+    button = 'block'
+  }
+  console.log('Display method: ', button)
+  const username = req.query.friend_username
+  console.log('Friend Collection: ', username)
+  const query_deck_id = 'SELECT deck_id from users WHERE username = $1'
+  const deck_id = await db.one(query_deck_id, [username])
+  console.log('deck id: ', deck_id)
+  // console.log(res.json(req.session.user));
+  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const cards = await db.any(query, [username]);
+  console.log('friends cards: ', cards)
+  const queryprice = 'SELECT SUM(cards.card_price) from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const price = await db.any(queryprice, [username]);
+  console.log('price: ', price)
+  console.log('cards: ', cards)
+  res.render('pages/friendscollection', { user: username, deck_id: deck_id, cards: cards, price: price, error: null, display: button })
+});
 
 app.get('/home', (req, res) => {
   if (!req.session.user) {
@@ -280,9 +317,6 @@ app.get('/home', (req, res) => {
   res.render('pages/home', { user: req.session.user, error: null })
 });
 
-app.post('/add-deck', async (req, res) => {
-
-})
 app.get('/search', async (req, res) => {
   const name = req.query.search;
 
@@ -310,21 +344,54 @@ app.post('/add-card', async (req, res) => {
   const card_rarity = req.body.card_rarity
   const card_price = req.body.card_price
   const card_set = req.body.card_set
-  console.log('Card id: ', card_id)
-  console.log('Card name: ', card_name)
-  console.log('Card image: ', card_image)
-  console.log('Card rarity: ', card_rarity)
-  console.log('Card price: ', card_price)
-  console.log('Card set: ', card_set)
-  console.log('Deck id: ', req.session.user.deck_id)
+  console.log('Add card', req.body)
   const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
-  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set]);
+  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set])
   const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
-  await db.none(query2, [req.session.user.deck_id, card_id]);
-
+  await db.none(query2, [req.session.user.deck_id, card_id])
   res.redirect('/profile')
 });
 
+
+app.post('/trade-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const deck_id = req.body.deck_id
+  console.log('Trade card: ', req.body)
+  const query = 'INSERT INTO trade_cards (card_id, deck_id) VALUES ($1, $2)'
+  db.none(query, [card_id, deck_id])
+  res.redirect('/friends')
+})
+
+app.post('/cancel-trade', async (req, res) => {
+  const truncate = 'TRUNCATE TABLE trade_cards'
+  await db.none(truncate)
+  res.redirect('/profile')
+})
+
+app.post('/friend-trade-card', async (req, res) => {
+  console.log('Friend Trade card: ', req.body)
+  const trade_card_id = req.body.card_id
+  const deck_id = req.body.deck_id
+  const query_card_id = 'SELECT card_id from trade_cards WHERE deck_id = $1'
+  const user_card_id = await db.one(query_card_id, [req.session.user.deck_id])
+  console.log('trade card id:', trade_card_id)
+  console.log('user card id:', user_card_id.card_id)
+  const card1 = 'UPDATE deck_cards SET card_id = $1 WHERE deck_id = $2 AND card_id = $3'
+  await db.none(card1, [trade_card_id, req.session.user.deck_id, user_card_id.card_id])
+  const card2 = 'UPDATE deck_cards SET card_id = $1 WHERE deck_id = $2 AND card_id = $3'
+  await db.none(card2, [user_card_id.card_id, deck_id, trade_card_id])
+  const truncate = 'TRUNCATE TABLE trade_cards'
+  await db.none(truncate)
+  res.redirect('/profile')
+})
+
+app.post('/remove-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const deck_id = req.body.deck_id
+  const query = 'DELETE FROM deck_cards where card_id = $1 AND deck_id = $2'
+  await db.none(query, [card_id, deck_id])
+  res.redirect('/profile')
+})
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/login');

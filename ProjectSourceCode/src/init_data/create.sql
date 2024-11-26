@@ -12,12 +12,12 @@ CREATE TABLE IF NOT EXISTS cards(
 -- Drop and recreate the `deck` table
 DROP TABLE IF EXISTS deck CASCADE;
 CREATE TABLE IF NOT EXISTS deck(
-    deck_id VARCHAR(255) PRIMARY KEY
+    deck_id SERIAL PRIMARY KEY
 );
 
 DROP TABLE IF EXISTS deck_cards CASCADE;
 CREATE TABLE IF NOT EXISTS deck_cards(
-    deck_id VARCHAR(255) NOT NULL,
+    deck_id INT NOT NULL,
     card_id VARCHAR(25) NOT NULL,
     FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
     FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS users(
     username VARCHAR(50) NOT NULL UNIQUE,
     password CHAR(60) NOT NULL,
     status VARCHAR(50),
-    deck_id VARCHAR(255),
+    deck_id SERIAL NOT NULL,
     FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE
 );
 
@@ -66,3 +66,9 @@ CREATE TABLE IF NOT EXISTS community_forms(
     -- form_comments_id INT NOT NULL,
     -- FOREIGN KEY (form_comments_id) REFERENCES form_comments (form_comments_id) ON DELETE CASCADE
 );
+
+DROP TABLE IF EXISTS trade_cards CASCADE;
+CREATE TABLE IF NOT EXISTS trade_cards(
+    card_id VARCHAR(25) PRIMARY KEY,
+    deck_id INT
+)
