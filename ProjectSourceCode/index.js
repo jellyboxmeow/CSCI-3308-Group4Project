@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const { exists } = require('fs');
 
 
 // *****************************************************
@@ -22,9 +23,10 @@ const hbs = handlebars.create({
   partialsDir: __dirname + '/src/views/partials',
 });
 
+
 // database configuration
 const dbConfig = {
-  host: process.env.HOST, // the database server
+  host: 'db', // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -101,7 +103,7 @@ app.get('/friends', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  try{
+  try {
     const userId = req.session.user.users_id;
     const username = req.session.user.username;
     // Fetch list of users that are friends
@@ -128,13 +130,13 @@ app.get('/friends', async (req, res) => {
 
     console.log(req.session.friends);
 
-    res.render('pages/friends', { 
-      user: req.session.user, 
+    res.render('pages/friends', {
+      user: req.session.user,
       error: null,
       friendsList: req.session.friends || [],
-      unfriendedList:  req.session.unfriendedList || []
+      unfriendedList: req.session.unfriendedList || []
     });
-  }catch{
+  } catch {
     console.error(err);
     res.status(500).render('pages/friends', { error: 'An error occurred while fetching friends data.' });
   }
@@ -216,9 +218,12 @@ app.post('/register', async (req, res) => {
       return res.status(400).redirect('/login');
     }
 
+    const queryDeck = 'INSERT INTO deck DEFAULT VALUES RETURNING deck_id'
+    await db.one(queryDeck)
+
     // Insert new user into the database
-    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2)';
-    await db.none(queryText, [username, hash]);
+    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING deck_id';
+    await db.one(queryText, [username, hash]);
 
     // Respond with success message
     // res.status(200).json({ message: 'Success' });
@@ -266,57 +271,9 @@ const auth = (req, res, next) => {
   next();
 };
 
-app.use('/friends', auth);
-app.use('/search', auth);
-app.use('/profile', auth);
-// app.use('/home', auth);
-app.use('/logout', auth);
-app.use('/forms', auth);
-
-app.get('/profile', async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');  // Redirect if there's no user in session
-  }
-  console.log('User in session:', req.session.user);  // Debugging line
-  // console.log(res.json(req.session.user));
-  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
-  const cards = await db.any(query, [req.session.user.username]);
-  console.log('cards: ', cards)
-  res.render('pages/profile', { user: req.session.user, cards: cards, error: null })
-});
-
-app.post('/add-deck', async (req, res) => {
-  if (!req.session.user) {
-    return res.redirect('/login');  // Redirect if there's no user in session
-  }
-  const deck_id = req.body.deck_name
-  const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
-  await db.none(deck_query, [deck_id]);
-  const user = req.session.user.username
-  console.log('username: ', user)
-  const query = 'UPDATE users SET deck_id = $1 WHERE username = $2'
-  console.log('test1')
-  await db.none(query, [deck_id, user]);
-  console.log('test2')
-  req.session.user.deck_id = deck_id
-  console.log('User in session:', req.session.user);
-  res.redirect('/profile')
-})
-
-app.get('/home', (req, res) => {
-  if (!req.session.user) {
-    // Redirect to login if somehow accessed directly without being logged in
-    return res.redirect('/login');
-  }
-  res.render('pages/home', { user: req.session.user, error: null })
-});
-
-app.post('/add-deck', async (req, res) => {
-
-})
-app.get('/search', async (req, res) => {
+app.get('/search', (req, res) => {
   const name = req.query.search;
-
+  console.log(name);
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
@@ -325,13 +282,28 @@ app.get('/search', async (req, res) => {
     }
   })
     .then(results => {
-      console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
-      res.render('pages/search', { cards: results.data.data });
+      //console.log(results.data); // the results will be displayed on the terminal if the docker containers are running
+      res.render('pages/search', { user: req.session.user, cards: results.data.data });
     })
     .catch(error => {
       // Handle errors
       res.status(400);
     });
+});
+
+app.post('/add-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const card_name = req.body.card_name
+  const card_image = req.body.card_image
+  const card_rarity = req.body.card_rarity
+  const card_price = req.body.card_price
+  const card_set = req.body.card_set
+  console.log('Add card', req.body)
+  const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
+  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set])
+  const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
+  await db.none(query2, [req.session.user.deck_id, card_id])
+  res.redirect('/profile')
 });
 
 app.get('/forms', async (req, res) => {
@@ -342,32 +314,49 @@ app.get('/forms', async (req, res) => {
   res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
 });
 
-app.post('/forms/add', async(req,res) => {
+app.post('/forms/add', async (req, res) => {
 
 });
 
-app.post('/add-card', async (req, res) => {
+app.post('/trade-card', async (req, res) => {
   const card_id = req.body.card_id
-  const card_name = req.body.card_name
-  const card_image = req.body.card_image
-  const card_rarity = req.body.card_rarity
-  const card_price = req.body.card_price
-  const card_set = req.body.card_set
-  console.log('Card id: ', card_id)
-  console.log('Card name: ', card_name)
-  console.log('Card image: ', card_image)
-  console.log('Card rarity: ', card_rarity)
-  console.log('Card price: ', card_price)
-  console.log('Card set: ', card_set)
-  console.log('Deck id: ', req.session.user.deck_id)
-  const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
-  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set]);
-  const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
-  await db.none(query2, [req.session.user.deck_id, card_id]);
+  const deck_id = req.body.deck_id
+  console.log('Trade card: ', req.body)
+  const query = 'INSERT INTO trade_cards (card_id, deck_id) VALUES ($1, $2)'
+  db.none(query, [card_id, deck_id])
+  res.redirect('/friends')
+})
 
-  res.redirect('/profile');
-});
+app.post('/cancel-trade', async (req, res) => {
+  const truncate = 'TRUNCATE TABLE trade_cards'
+  await db.none(truncate)
+  res.redirect('/profile')
+})
 
+app.post('/friend-trade-card', async (req, res) => {
+  console.log('Friend Trade card: ', req.body)
+  const trade_card_id = req.body.card_id
+  const deck_id = req.body.deck_id
+  const query_card_id = 'SELECT card_id from trade_cards WHERE deck_id = $1'
+  const user_card_id = await db.one(query_card_id, [req.session.user.deck_id])
+  console.log('trade card id:', trade_card_id)
+  console.log('user card id:', user_card_id.card_id)
+  const card1 = 'UPDATE deck_cards SET card_id = $1 WHERE deck_id = $2 AND card_id = $3'
+  await db.none(card1, [trade_card_id, req.session.user.deck_id, user_card_id.card_id])
+  const card2 = 'UPDATE deck_cards SET card_id = $1 WHERE deck_id = $2 AND card_id = $3'
+  await db.none(card2, [user_card_id.card_id, deck_id, trade_card_id])
+  const truncate = 'TRUNCATE TABLE trade_cards'
+  await db.none(truncate)
+  res.redirect('/profile')
+})
+
+app.post('/remove-card', async (req, res) => {
+  const card_id = req.body.card_id
+  const deck_id = req.body.deck_id
+  const query = 'DELETE FROM deck_cards where card_id = $1 AND deck_id = $2'
+  await db.none(query, [card_id, deck_id])
+  res.redirect('/profile')
+})
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/login');
