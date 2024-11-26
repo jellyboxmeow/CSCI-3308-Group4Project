@@ -1,0 +1,4 @@
+Kristina - Worked on profile page and home page with some features being added from Alan and Mason
+Ben - Worked on the community forms and will be implementing the add for the forms
+Mason - Worked on displaying the API and deck value as well as connecting the deck to users 
+Alan - Worked on the adding friends page as well as test cases for friends page

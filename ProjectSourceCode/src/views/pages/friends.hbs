@@ -1,4 +1,5 @@
-<div class="container-fluid d-flex justify-content-center vstack col-md-12 mx-auto">
+<div class="container-fluid d-flex justify-content vstack col-md-12 mx-auto">
+
     <h1 class="fw-bold text-decoration-underline">Friends</h1>
 
     {{#if friendsList.length}}
@@ -33,6 +34,29 @@
     {{/if}}
     <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
 
+    {{!-- Incoming Friend Requests --}}
+    {{!-- {{#if friendsList.length}}
+    <table class="table table-striped container-fluid">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="fs-4">Incoming Requests</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+    {{else}}
+    <table class="table table-striped container-fluid">
+        <thead>
+            <tr>
+                <th class="fs-4 text-center">Incoming Requests</th>
+            </tr>
+        </thead>
+    </table>
+    <p class="text-center fs-5 fw-bold">You currently have no incoming friend requests</p>
+    {{/if}} --}}
+
     <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -45,11 +69,29 @@
                         <div class="mb-3">
                             <input type="hidden" id="currentUserId" value="{{user.users_id}}">
                             <label for="friendUsername" class="form-label">Friend's Username</label>
-                            <input type="text" class="form-control" id="friendUsername" required
+                            <<<<<<< HEAD <input type="text" class="form-control" id="friendUsername" required
                                 placeholder="Enter username">
+                                =======
+                                <input type="text" class="form-control" id="friendUsername" required
+                                    placeholder="Enter username">
+                                <!-- Unfriended Users List -->
+                                <div class="overflow-auto" style="max-height: 200px;">
+                                    <div>
+                                        <small>Users you could be friends with:</small>
+                                    </div>
+                                    <ul id="unfriendedList" class="list-group">
+                                        {{#each unfriendedList}}
+                                        <li class="list-group-item">
+                                            <label for="friend-{{this}}">{{this}}</label>
+                                        </li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                                >>>>>>> origin/main
                         </div>
+
                         <div id="error-message" class="text-danger" style="display: none;">
-                            <small>Please enter a valid username.</small>
+                            <small>This is where messages go</small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -106,8 +148,12 @@
                         setTimeout(() => successMessage.remove(), 3000);
                         console.log(data);
 
+<<<<<<< HEAD
                         // Dynamically add the new friend to the friend list
                         //friendsListBody.innerHTML = '';
+=======
+                    // Dynamically add the new friend to the friend list
+>>>>>>> origin/main
 
                         const friendsTable = document.querySelector('tbody');
                         const newRow = document.createElement('tr');

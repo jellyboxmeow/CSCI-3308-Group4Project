@@ -144,14 +144,14 @@ describe('Friends Route API', () => {
       // console.log(res);
 
       expect(res).to.have.status(200);
-      res.text.should.include('You have no friends');
+      res.text.should.include('You currently have no friends<');
     });
     it('Positive: Logged in with friends displays friends', async () => {
       await agent.post('/login').send({ username: 'test', password: 'test' });
       const res = await agent.get('/friends');
 
       expect(res).to.have.status(200);
-      res.text.should.not.include('You have no friends');
+      res.text.should.not.include('You currently have no friends<');
     });
     it('Positive: Adding Friends successfully', async () => {
       await agent.post('/login').send(userData); //John Doe's user data
