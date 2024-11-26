@@ -1,70 +1,60 @@
 <div class="container-fluid d-flex justify-content vstack col-md-12 mx-auto">
-    
+
     <h1 class="fw-bold text-decoration-underline">Friends</h1>
 
-    {{!-- Current Friends --}}
-    <div class="overflow-auto" style="max-height: 400px;">
-        {{#if friendsList.length}}
-        <table class="table table-striped container-fluid">
-            <thead>
-                    <tr>
-                        <th></th>
-                        <th class="fs-4">Username</th>
-                        <th class="text-end fs-4">View Collection</th>
-                    </tr>
-            </thead>
-            <tbody class="table-group-divider" id="friendsListBody">
-                {{#each friendsList}}
-                    <tr>
-                        <td></td>
-                        <td>{{this}}</td>
-                        {{!-- <td>Oct. 12 2024</td> --}}
-                        <td class="text-end">
-                            <a class="btn btn-outline-success" href="/search">View</a>
-                        </td>
-                    </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{!-- TODO: Have to update when have no friends, dynamically --}}
-        {{!-- Message for if you have no friends --}}
-        {{else}}
-            <table class="table table-striped container-fluid">
-                <thead>
-                        <tr>
-                            <th></th>
-                            <th class="fs-4">Username</th>
-                            <th class="text-end fs-4">View Collection</th>
-                        </tr>
-                </thead>
-            </table>
-            <p class="text-center fs-5 fw-bold">You currently have no friends</p>
-        {{/if}}
-    </div>
-
+    {{#if friendsList.length}}
+    <table class="table table-striped container-fluid">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="fs-4">Username</th>
+                <th class="text-end fs-4">View Collection</th>
+            </tr>
+        </thead>
+        <tbody id="friendsListBody">
+            {{#each friendsList}}
+            <tr>
+                <td></td>
+                <td>{{this}}</td>
+                {{!-- <td>Oct. 12 2024</td> --}}
+                <td class="text-end">
+                    <form action="/friendscollection" method="GET">
+                        <input type="hidden" name="friend_username" value="{{this}}">
+                        <button type="submit">View</button>
+                    </form>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{!-- TODO: Have to update when have no friends, dynamically --}}
+    {{!-- Message for if you have no friends --}}
+    {{else}}
+    <p>You have no friends</p>
+    {{/if}}
     <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
-    
+
     {{!-- Incoming Friend Requests --}}
     {{!-- {{#if friendsList.length}}
-        <table class="table table-striped container-fluid">
-            <thead>
-                    <tr>
-                        <th></th>
-                        <th class="fs-4">Incoming Requests</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-            </thead>
-        </table>
+    <table class="table table-striped container-fluid">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="fs-4">Incoming Requests</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
     {{else}}
-        <table class="table table-striped container-fluid">
-            <thead>
-                    <tr>
-                        <th class="fs-4 text-center">Incoming Requests</th>
-                    </tr>
-            </thead>
-        </table>
-        <p class="text-center fs-5 fw-bold">You currently have no incoming friend requests</p>
+    <table class="table table-striped container-fluid">
+        <thead>
+            <tr>
+                <th class="fs-4 text-center">Incoming Requests</th>
+            </tr>
+        </thead>
+    </table>
+    <p class="text-center fs-5 fw-bold">You currently have no incoming friend requests</p>
     {{/if}} --}}
 
     <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
@@ -79,7 +69,8 @@
                         <div class="mb-3">
                             <input type="hidden" id="currentUserId" value="{{user.users_id}}">
                             <label for="friendUsername" class="form-label">Friend's Username</label>
-                            <input type="text" class="form-control" id="friendUsername" required placeholder="Enter username">
+                            <input type="text" class="form-control" id="friendUsername" required
+                                placeholder="Enter username">
                             <!-- Unfriended Users List -->
                             <div class="overflow-auto" style="max-height: 200px;">
                                 <div>
@@ -87,9 +78,9 @@
                                 </div>
                                 <ul id="unfriendedList" class="list-group">
                                     {{#each unfriendedList}}
-                                        <li class="list-group-item">
-                                            <label for="friend-{{this}}">{{this}}</label>
-                                        </li>
+                                    <li class="list-group-item">
+                                        <label for="friend-{{this}}">{{this}}</label>
+                                    </li>
                                     {{/each}}
                                 </ul>
                             </div>
@@ -136,48 +127,48 @@
                 },
                 body: JSON.stringify({ users_id, friend_username }) // Sending the user ID and friend's username
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Close the modal after adding the friend successfully
-                    var modal = bootstrap.Modal.getInstance(document.getElementById('friendModal'));
-                    modal.hide();
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close the modal after adding the friend successfully
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('friendModal'));
+                        modal.hide();
 
-                    // Show success message
-                    const successMessage = document.createElement('div');
-                    successMessage.classList.add('alert', 'alert-success');
-                    successMessage.innerText = data.message || 'Friend added successfully!';
-                    document.querySelector('.container-fluid').prepend(successMessage);
+                        // Show success message
+                        const successMessage = document.createElement('div');
+                        successMessage.classList.add('alert', 'alert-success');
+                        successMessage.innerText = data.message || 'Friend added successfully!';
+                        document.querySelector('.container-fluid').prepend(successMessage);
 
-                    // Remove the success message after 3 seconds
-                    setTimeout(() => successMessage.remove(), 3000);
-                    console.log(data);
+                        // Remove the success message after 3 seconds
+                        setTimeout(() => successMessage.remove(), 3000);
+                        console.log(data);
 
-                    // Dynamically add the new friend to the friend list
+                        // Dynamically add the new friend to the friend list
 
-                    const friendsTable = document.querySelector('tbody');
-                    const newRow = document.createElement('tr');
-                    newRow.innerHTML = `
+                        const friendsTable = document.querySelector('tbody');
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
                     <td></td>
                     <td>${friend_username}</td>
                     <td class="text-end">
                         <a class="btn btn-outline-success" href="/search">View</a>
                     </td>
                     `;
-                    friendsTable.appendChild(newRow);
+                        friendsTable.appendChild(newRow);
 
-                    document.getElementById('friendUsername').value = ''; 
-                    console.log('Friend added successfully!');
-                } else {
-                    // Show an error message if something went wrong
-                    console.error('Failed to add friend:', data.message);
-                    errorMessage.style.display = 'block';
-                    errorMessage.innerText = data.message || 'Failed to add friend.';
-                }
-            })
-            .catch(error => {
-                console.error('Error adding friend:', error);
-            });
+                        document.getElementById('friendUsername').value = '';
+                        console.log('Friend added successfully!');
+                    } else {
+                        // Show an error message if something went wrong
+                        console.error('Failed to add friend:', data.message);
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerText = data.message || 'Failed to add friend.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding friend:', error);
+                });
         }
     });
 </script>
