@@ -30,7 +30,7 @@
     {{!-- TODO: Have to update when have no friends, dynamically --}}
     {{!-- Message for if you have no friends --}}
     {{else}}
-    <p>You have no friends</p>
+    <p>You currently have no friends</p>
     {{/if}}
     <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
 
@@ -69,11 +69,8 @@
                         <div class="mb-3">
                             <input type="hidden" id="currentUserId" value="{{user.users_id}}">
                             <label for="friendUsername" class="form-label">Friend's Username</label>
-                            <<<<<<< HEAD <input type="text" class="form-control" id="friendUsername" required
+                            <input type="text" class="form-control" id="friendUsername" required
                                 placeholder="Enter username">
-                                =======
-                                <input type="text" class="form-control" id="friendUsername" required
-                                    placeholder="Enter username">
                                 <!-- Unfriended Users List -->
                                 <div class="overflow-auto" style="max-height: 200px;">
                                     <div>
@@ -87,7 +84,6 @@
                                         {{/each}}
                                     </ul>
                                 </div>
-                                >>>>>>> origin/main
                         </div>
 
                         <div id="error-message" class="text-danger" style="display: none;">
