@@ -271,9 +271,100 @@ const auth = (req, res, next) => {
   next();
 };
 
-app.get('/search', (req, res) => {
+app.use('/friends', auth);
+app.use('/search', auth);
+app.use('/profile', auth);
+// app.use('/home', auth);
+app.use('/logout', auth);
+app.use('/forms', auth);
+
+app.get('/profile', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
+  console.log('User in session:', req.session.user);  // Debugging line
+  // console.log(res.json(req.session.user));
+  const query_exists = 'SELECT COUNT(*) from trade_cards'
+  const exists = await db.one(query_exists)
+  var button
+  var opp_button
+  if (exists.count == 0) {
+    button = 'block'
+    opp_button = 'none'
+  }
+  else {
+    button = 'none'
+    opp_button = 'block'
+  }
+  console.log('Display method: ', button)
+  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const cards = await db.any(query, [req.session.user.username]);
+  const queryprice = 'SELECT SUM(cards.card_price) from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const price = await db.any(queryprice, [req.session.user.username]);
+  // console.log('price: ', price)
+  // console.log('cards: ', cards)
+  res.render('pages/profile', { user: req.session.user, cards: cards, price: price, error: null, display: button, opp_display: opp_button })
+});
+
+app.get('/friendscollection', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
+  const query_exists = 'SELECT COUNT(*) from trade_cards'
+  const exists = await db.one(query_exists)
+  var button
+  if (exists.count == 0) {
+    button = 'none'
+  }
+  else {
+    button = 'block'
+  }
+  console.log('Display method: ', button)
+  const username = req.query.friend_username
+  console.log('Friend Collection: ', username)
+  const query_deck_id = 'SELECT deck_id from users WHERE username = $1'
+  const deck_id = await db.one(query_deck_id, [username])
+  console.log('deck id: ', deck_id)
+  // console.log(res.json(req.session.user));
+  const query = 'SELECT * from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const cards = await db.any(query, [username]);
+  console.log('friends cards: ', cards)
+  const queryprice = 'SELECT SUM(cards.card_price) from cards INNER JOIN deck_cards ON cards.id = deck_cards.card_id INNER JOIN deck ON deck_cards.deck_id = deck.deck_id INNER JOIN users ON deck.deck_id = users.deck_id WHERE users.username = $1'
+  const price = await db.any(queryprice, [username]);
+  console.log('price: ', price)
+  console.log('cards: ', cards)
+  res.render('pages/friendscollection', { user: username, deck_id: deck_id, cards: cards, price: price, error: null, display: button })
+});
+
+app.post('/add-deck', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');  // Redirect if there's no user in session
+  }
+  const deck_id = req.body.deck_name
+  const deck_query = 'INSERT INTO deck(deck_id) VALUES ($1)'
+  await db.none(deck_query, [deck_id]);
+  const user = req.session.user.username
+  console.log('username: ', user)
+  const query = 'UPDATE users SET deck_id = $1 WHERE username = $2'
+  console.log('test1')
+  await db.none(query, [deck_id, user]);
+  console.log('test2')
+  req.session.user.deck_id = deck_id
+  console.log('User in session:', req.session.user);
+  res.redirect('/profile')
+})
+
+app.get('/home', (req, res) => {
+  if (!req.session.user) {
+    // Redirect to login if somehow accessed directly without being logged in
+    return res.redirect('/login');
+  }
+  res.render('pages/home', { user: req.session.user, error: null })
+});
+
+app.get('/search', async (req, res) => {
   const name = req.query.search;
-  console.log(name);
+
   axios({
     url: 'https://api.pokemontcg.io/v2/cards',
     method: 'GET',
