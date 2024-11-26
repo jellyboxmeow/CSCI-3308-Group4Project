@@ -69,25 +69,21 @@
                         <div class="mb-3">
                             <input type="hidden" id="currentUserId" value="{{user.users_id}}">
                             <label for="friendUsername" class="form-label">Friend's Username</label>
-                            <<<<<<< HEAD <input type="text" class="form-control" id="friendUsername" required
+                            <input type="text" class="form-control" id="friendUsername" required
                                 placeholder="Enter username">
-                                =======
-                                <input type="text" class="form-control" id="friendUsername" required
-                                    placeholder="Enter username">
-                                <!-- Unfriended Users List -->
-                                <div class="overflow-auto" style="max-height: 200px;">
-                                    <div>
-                                        <small>Users you could be friends with:</small>
-                                    </div>
-                                    <ul id="unfriendedList" class="list-group">
-                                        {{#each unfriendedList}}
-                                        <li class="list-group-item">
-                                            <label for="friend-{{this}}">{{this}}</label>
-                                        </li>
-                                        {{/each}}
-                                    </ul>
+                            <!-- Unfriended Users List -->
+                            <div class="overflow-auto" style="max-height: 200px;">
+                                <div>
+                                    <small>Users you could be friends with:</small>
                                 </div>
-                                >>>>>>> origin/main
+                                <ul id="unfriendedList" class="list-group">
+                                    {{#each unfriendedList}}
+                                    <li class="list-group-item">
+                                        <label for="friend-{{this}}">{{this}}</label>
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                            </div>
                         </div>
 
                         <div id="error-message" class="text-danger" style="display: none;">
@@ -148,12 +144,7 @@
                         setTimeout(() => successMessage.remove(), 3000);
                         console.log(data);
 
-<<<<<<< HEAD
                         // Dynamically add the new friend to the friend list
-                        //friendsListBody.innerHTML = '';
-=======
-                    // Dynamically add the new friend to the friend list
->>>>>>> origin/main
 
                         const friendsTable = document.querySelector('tbody');
                         const newRow = document.createElement('tr');

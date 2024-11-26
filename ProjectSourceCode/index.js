@@ -397,6 +397,17 @@ app.post('/add-card', async (req, res) => {
   res.redirect('/profile')
 });
 
+app.get('/forms', async (req, res) => {
+  const formsQuery = 'SELECT * FROM community_forms';
+  const community_forms = await db.any(formsQuery);
+  req.session.forms = community_forms;
+  console.log(community_forms); // sending to console to test
+  res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
+});
+
+app.post('/forms/add', async (req, res) => {
+
+});
 
 app.post('/trade-card', async (req, res) => {
   const card_id = req.body.card_id
