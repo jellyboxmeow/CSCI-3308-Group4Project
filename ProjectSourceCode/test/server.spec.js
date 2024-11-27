@@ -117,8 +117,6 @@
 //     password: '20200220',
 //   };
 
-<<<<<<< HEAD
-=======
 //   before(async () => {
 //     // Clear users table and create test user
 //     await db.query('TRUNCATE TABLE users CASCADE');
@@ -208,7 +206,6 @@
 //     password: '20200220',
 //   };
 
->>>>>>> origin/main
 //   beforeEach(() => {
 //     // Create new agent for session handling
 //     agent = chai.request.agent(server);
