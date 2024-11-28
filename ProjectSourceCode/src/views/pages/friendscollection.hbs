@@ -75,6 +75,25 @@
         .flip-card-back {
             transform: rotateY(180deg);
         }
+
+        .trade_button {
+            margin-top: 10px;
+            border-radius: 20px;
+            width: 100px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            background-color: white;
+            transition: .3s ease-out;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .trade_button:hover {
+            color: white;
+            background-color: #363737;
+            transition: .3s ease-out;
+        }
     </style>
 </head>
 
@@ -114,7 +133,7 @@
                         <form action="/friend-trade-card" method="POST" style="display: {{../display}};">
                             <input type="hidden" name="card_id" value="{{this.id}}">
                             <input type="hidden" name="deck_id" value="{{../deck_id.deck_id}}">
-                            <button type="submit">Trade Card</button>
+                            <button type="submit" class="trade_button">Trade Card</button>
                         </form>
                     </div>
                 </div>

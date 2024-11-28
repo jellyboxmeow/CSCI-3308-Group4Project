@@ -28,16 +28,16 @@
             </tbody>
         </table>
         {{else}}
-            <table class="table table-striped container-fluid">
-                <thead>
-                        <tr>
-                            <th></th>
-                            <th class="fs-4">Username</th>
-                            <th class="text-end fs-4">View Collection</th>
-                        </tr>
-                </thead>
-            </table>
-            <p class="text-center fs-5 fw-bold">You currently have no friends</p>
+        <table class="table table-striped container-fluid">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="fs-4">Username</th>
+                    <th class="text-end fs-4">View Collection</th>
+                </tr>
+            </thead>
+        </table>
+        <p class="text-center fs-5 fw-bold">You currently have no friends</p>
         {{/if}}
     </div>
     <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friendModal">+ Add Friend</button>
@@ -56,7 +56,6 @@
                             <label for="friendUsername" class="form-label">Friend's Username</label>
                             <input type="text" class="form-control" id="friendUsername" required
                                 placeholder="Enter username">
-<<<<<<< HEAD
                             <!-- Unfriended Users List -->
                             <div class="overflow-auto" style="max-height: 200px;">
                                 <div>
@@ -70,21 +69,6 @@
                                     {{/each}}
                                 </ul>
                             </div>
-=======
-                                <!-- Unfriended Users List -->
-                                <div class="overflow-auto" style="max-height: 200px;">
-                                    <div>
-                                        <small>Users you could be friends with:</small>
-                                    </div>
-                                    <ul id="unfriendedList" class="list-group">
-                                        {{#each unfriendedList}}
-                                        <li class="list-group-item">
-                                            <label for="friend-{{this}}">{{this}}</label>
-                                        </li>
-                                        {{/each}}
-                                    </ul>
-                                </div>
->>>>>>> origin/main
                         </div>
 
                         <div id="error-message" class="text-danger" style="display: none;">
@@ -144,13 +128,8 @@
                         // Remove the success message after 3 seconds
                         setTimeout(() => successMessage.remove(), 3000);
                         console.log(data);
-<<<<<<< HEAD
-
-                        // Dynamically add the new friend to the friend list
-=======
                         // Dynamically add the new friend to the friend list
                         //friendsListBody.innerHTML = '';
->>>>>>> origin/main
 
                         const friendsTable = document.querySelector('tbody');
                         const newRow = document.createElement('tr');
@@ -164,7 +143,7 @@
                                 </form>
                             </td>
                             `;
-                              
+
                         friendsTable.appendChild(newRow);
 
                         document.getElementById('friendUsername').value = '';
