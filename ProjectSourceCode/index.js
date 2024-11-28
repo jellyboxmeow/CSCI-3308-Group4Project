@@ -26,7 +26,7 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-  host: process.env.HOST, // the database server
+  host: 'db', // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -390,11 +390,21 @@ app.post('/add-card', async (req, res) => {
   const card_price = req.body.card_price
   const card_set = req.body.card_set
   console.log('Add card', req.body)
-  const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
-  await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set])
-  const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
-  await db.none(query2, [req.session.user.deck_id, card_id])
-  res.redirect('/profile')
+  const query_exists = 'SELECT EXISTS (SELECT * FROM cards WHERE id = $1)'
+  const status = await db.one(query_exists, [card_id])
+  console.log(status.exists)
+  if (status.exists == false) {
+    const query = `INSERT INTO cards (id, card_name, card_image, card_rarity, card_price, card_set) VALUES ($1, $2, $3, $4, $5, $6)`
+    await db.none(query, [card_id, card_name, card_image, card_rarity, card_price, card_set])
+    const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
+    await db.none(query2, [req.session.user.deck_id, card_id])
+    res.redirect('/profile')
+  }
+  else {
+    const query2 = 'INSERT INTO deck_cards (deck_id, card_id) VALUES ($1, $2)'
+    await db.none(query2, [req.session.user.deck_id, card_id])
+    res.redirect('/profile')
+  }
 });
 
 app.get('/forms', async (req, res) => {
@@ -444,8 +454,11 @@ app.post('/friend-trade-card', async (req, res) => {
 app.post('/remove-card', async (req, res) => {
   const card_id = req.body.card_id
   const deck_id = req.body.deck_id
-  const query = 'DELETE FROM deck_cards where card_id = $1 AND deck_id = $2'
-  await db.none(query, [card_id, deck_id])
+  const query_index = 'SELECT row_index FROM deck_cards WHERE card_id = $1 LIMIT 1'
+  const index = await db.one(query_index, [card_id])
+  console.log('index:', index.row_index)
+  const query = 'DELETE FROM deck_cards where card_id = $1 AND deck_id = $2 and row_index = $3'
+  await db.none(query, [card_id, deck_id, index.row_index])
   res.redirect('/profile')
 })
 app.get('/logout', (req, res) => {

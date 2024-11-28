@@ -74,6 +74,57 @@
         .flip-card-back {
             transform: rotateY(180deg);
         }
+
+        .trade_button {
+            margin-top: 10px;
+            border-radius: 20px;
+            width: 100px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            background-color: white;
+            transition: .3s ease-out;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .trade_button:hover {
+            color: white;
+            background-color: #363737;
+            transition: .3s ease-out;
+        }
+
+        .remove_button {
+            border-radius: 20px;
+            width: 120px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            background-color: white;
+            transition: .3s ease-out;
+            padding-top: 5px;
+            padding-bottom: 5px
+        }
+
+        .remove_button:hover {
+            color: white;
+            background-color: #B22222;
+            transition: .3s ease-out;
+        }
+
+        .cancel_button {
+            border-radius: 20px;
+            width: 120px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            background-color: white;
+            transition: .3s ease-out;
+            padding-top: 5px;
+            padding-bottom: 5px
+        }
+
+        .cancel_button:hover {
+            color: white;
+            background-color: #B22222;
+            transition: .3s ease-out;
+        }
     </style>
 </head>
 
@@ -85,7 +136,7 @@
             <h2>Username: {{user.username}}</h2>
             <h3>Your Deck of Cards</h3>
             {{#each price}}
-            <h3>Value of your deck: {{sum}}$</h3>
+            <h3>Value of your deck: ${{sum}}</h3>
             {{/each}}
         </div>
         <div style="display: flex; justify-content: center; margin-top: 50px; padding-bottom: 100px">
@@ -118,21 +169,21 @@
                     <div>
                         <h5>{{this.card_name}}</h5>
                         <h5>Set: {{this.card_set}}</h5>
-                        <h5>Price: {{this.card_price}}</h5>
+                        <h5>Price: ${{this.card_price}}</h5>
                         <form action="/trade-card" method="POST" style="display: {{../display}}; margin-bottom: 15px">
                             <input type="hidden" name="card_id" value="{{this.id}}">
                             <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
-                            <button type="submit">Trade Card</button>
+                            <button type="submit" class="trade_button">Trade Card</button>
                         </form>
                         <form action="/remove-card" method="POST" style="display: {{../display}};">
                             <input type="hidden" name="card_id" value="{{this.id}}">
                             <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
-                            <button type="submit">Remove card</button>
+                            <button type="submit" class="remove_button">Remove card</button>
                         </form>
                         <form action="/cancel-trade" method="POST" style="display: {{../opp_display}};">
                             <input type="hidden" name="card_id" value="{{this.id}}">
                             <input type="hidden" name="deck_id" value="{{../user.deck_id}}">
-                            <button type="submit">Cancel Trade</button>
+                            <button type="submit" class="cancel_button">Cancel Trade</button>
                         </form>
                     </div>
                 </div>
