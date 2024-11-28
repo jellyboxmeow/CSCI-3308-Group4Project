@@ -1,7 +1,48 @@
-<form action="/search" method="GET">
-    <label for="search">Search Pokemon:</label>
-    <input type="search" id="search" name="search">
-    <button type="submit">Search</button>
+<style>
+    .search_bar {
+        margin-right: 20px;
+        border: 2px solid #363737;
+        border-radius: 20px;
+        padding: 10px;
+        padding-left: 15px;
+        width: 400px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    .search_button {
+        border-radius: 20px;
+        width: 100px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        background-color: white;
+        transition: .3s ease-out;
+    }
+
+    .search_button:hover {
+        color: white;
+        background-color: #363737;
+        transition: .3s ease-out;
+    }
+
+    .add_button {
+        margin-top: 7px;
+        border-radius: 20px;
+        width: 100px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        background-color: white;
+        transition: .3s ease-out;
+        padding-top: 5px;
+        padding-bottom: 5px
+    }
+
+    .add_button:hover {
+        color: white;
+        background-color: #363737;
+        transition: .3s ease-out;
+    }
+</style>
+<form action="/search" method="GET" style="display: flex; justify-content: center; margin-top: 20px">
+    <input type="search" class="search_bar" id="search" name="search" placeholder="Search Pokemon">
+    <button type="submit" class="search_button">Search</button>
 </form>
 <div style="display: flex; justify-content: center; margin-top: 50px; padding-bottom: 50px">
     <div class="pokemon-cards"
@@ -10,20 +51,24 @@
         <div class="search_card" style="display: flex; flex-direction: column">
             <img class="search_image" src="{{this.images.large}}" alt="{{this.name}}"
                 style="width: 250px; height: auto;">
-            <h5>{{this.name}}</h5>
-            <h5>Set: {{this.set.name}}</h5>
-            <h5>Price: {{this.cardmarket.prices.averageSellPrice}}</h5>
-            <div class="search_button">
-                <form action="/add-card" method="POST">
-                    <input type="hidden" name="card_id" value="{{this.id}}">
-                    <input type="hidden" name="card_name" value="{{this.name}}">
-                    <input type="hidden" name="card_image" value="{{this.images.large}}">
-                    <input type="hidden" name="card_rarity" value="{{this.rarity}}">
-                    <input type="hidden" name="card_price" value="{{this.cardmarket.prices.averageSellPrice}}">
-                    <input type="hidden" name="card_set" value="{{this.set.name}}">
-                    <button type="submit">Add Card</button>
-                </form>
+            <h5 style="margin-top: 10px; font-weight: bold">{{this.name}}</h5>
+            <div style="display: flex; flex-direction: row;">
+                <h5 style="font-weight: bold; margin-right: 10px">Set: </h5>
+                <h5>{{this.set.name}}</h5>
             </div>
+            <div style="display: flex; flex-direction: row;">
+                <h5 style="font-weight: bold; margin-right: 10px">Price: </h5>
+                <h5>${{this.cardmarket.prices.averageSellPrice}}</h5>
+            </div>
+            <form action="/add-card" method="POST">
+                <input type="hidden" name="card_id" value="{{this.id}}">
+                <input type="hidden" name="card_name" value="{{this.name}}">
+                <input type="hidden" name="card_image" value="{{this.images.large}}">
+                <input type="hidden" name="card_rarity" value="{{this.rarity}}">
+                <input type="hidden" name="card_price" value="{{this.cardmarket.prices.averageSellPrice}}">
+                <input type="hidden" name="card_set" value="{{this.set.name}}">
+                <button type="submit" class="add_button">Add Card</button>
+            </form>
         </div>
         {{/each}}
     </div>

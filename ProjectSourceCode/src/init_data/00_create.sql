@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS deck_cards CASCADE;
 CREATE TABLE IF NOT EXISTS deck_cards(
     deck_id INT NOT NULL,
     card_id VARCHAR(25) NOT NULL,
+    row_index SERIAL,
     FOREIGN KEY (deck_id) REFERENCES deck(deck_id) ON DELETE CASCADE,
     FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
 );
