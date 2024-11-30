@@ -27,6 +27,7 @@ const hbs = handlebars.create({
 // database configuration
 const dbConfig = {
   host: "db", // the database server
+  // host: process.env.HOST, //to let the server be able to run
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -420,6 +421,7 @@ app.post('/add-form', async (req, res) => {
   const { form_user, form_name, form_type, form_description } = req.body;
 
   //send error if any are null
+  
   if (!form_user || !form_name || !form_type || !form_description) {
     return res.status(400).json({ success: false, message: 'All fields are required' });
   }

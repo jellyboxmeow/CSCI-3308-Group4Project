@@ -91,8 +91,9 @@
             </div>
         </div>
         {{/each}}
+        
         <div type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#formModal"
-            style="width: 18rem;height: 20rem;">
+            style="width:18rem;height:20rem;">
             <div class="card-body">
                 <h5 class="card-title">Add Form</h5>
                 <h1 class="card-subtitle mb-2 text-body-secondary">+</h1>
@@ -101,7 +102,7 @@
     </div>
 
     <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
-        <div class="model-dialog">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="formModalLabel">Add a New Form</h5>
@@ -111,32 +112,33 @@
                     <form id="addCommForm">
                         <input type="hidden" id="currUsername" value="{{user.username}}">
                         <label for="formName" class="form-label">Form Title</label>
-                        <input type="text" class="form-cotrol" id="formName" name="formName" required
+                        <input type="text" class="form-control" id="formName" name="formName" required
                             placeholder="Enter Title">
+                        <label for="formType" class="form-label">Form Type</label>
                         <select class="form-select" id="formType" aria-label="Form Type Selection">
-                            <option selected>Select a Type</option>
+                            <option value="0" selected>Select a Type</option>
                             <option value="1">Trading</option>
                             <option value="2">Showcase</option>
                             <option value="3">Collection</option>
                             <option value="4">Tournaments</option>
-                            <option value="3">LFG</option>
+                            <option value="5">LFG</option>
                         </select>
                         <label for="formDesc" class="form-label">Form Description</label>
-                        <textarea class="form-control" id="formDesc" name="formDesc" required
-                            placeholder="Enter Description">
-                    </textarea>
+                        <textarea type="text" class="form-control" id="formDesc" name="formDesc" required
+                            placeholder="Enter Description"></textarea>
                         <div class="text-danger" id="error-message" style="display: none;">
                             <small>This is where messages go</small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="addFormBtn">Add Form</button>
+                            <button type="submit" class="btn btn-primary" id="addFormBtn">Add Form</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 
@@ -149,17 +151,28 @@
         document.getElementById('addCommForm').addEventListener('submit', function (event) {
             event.preventDefault();  // Prevent the default form submission
 
-            const users_name = document.getElementById('currUsername').value; // Get the current user's usn from the hidden input
+            const form_user = document.getElementById('currUsername').value; // Get the current user's usn from the hidden input
             const form_name = document.getElementById('formName').value;
             const form_type = document.getElementById('formType').value;
             const form_description = document.getElementById('formDesc').value;
             const errorMessage = document.getElementById('error-message');
 
-            // Simple validation to check if username is empty
+            errorMessage.style.display = 'none';
+            // Simple check to check if username is empty
             if (form_name.trim() === '') {
                 errorMessage.style.display = 'block';
                 errorMessage.innerText = 'Please enter a valid title.';
-            } else {
+                return;  // Stop form submission if validation fails
+            } else if (form_type === "0") {  // Check for invalid form type
+                errorMessage.style.display = 'block';
+                errorMessage.innerText = 'Please select a valid form type.';
+                return;
+            } else if (form_description.trim() === '') {
+                errorMessage.style.display = 'block';
+                errorMessage.innerText = 'Please enter a form description.';
+                return;
+            }
+            else {
                 errorMessage.style.display = 'none';
 
                 // Send the data to the server using fetch API
@@ -168,13 +181,13 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ users_name, form_name, form_type, form_description }) // Sending the user ID and friend's username
+                    body: JSON.stringify({ form_user, form_name, form_type, form_description }) // Sending the user ID and friend's username
                 })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             // Close the modal after adding the friend successfully
-                            var modal = bootstrap.Modal.getInstance(document.getElementById('friendModal'));
+                            var modal = bootstrap.Modal.getInstance(document.getElementById('formModal'));
                             modal.hide();
 
                             // Show success message
@@ -205,7 +218,7 @@
 
                             // Reset the form inputs
                             document.getElementById('formName').value = '';
-                            document.getElementById('formType').value = '';
+                            document.getElementById('formType').value = "0";
                             document.getElementById('formDesc').value = '';
                             console.log('Form added successfully!');
                         } else {
