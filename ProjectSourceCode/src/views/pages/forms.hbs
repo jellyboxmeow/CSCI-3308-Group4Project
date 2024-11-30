@@ -77,17 +77,17 @@
     </style>
 </head>
 
-<div class="container my-5">
+<div class="container-fluid my-5">
     <h1 class="fw-bold text-decoration-underline">Forms</h1>
     <div class=""></div>
-    <div class="forms-grid">
+    <div class="forms-grid" id="forms-gridy">
         {{#each forms}}
         <div class="card" style="width: 18rem;height: 20rem;">
             <div class="card-body">
                 <h5 class="card-title">{{this.form_name}}</h5>
                 <h6 class="card-subtitle mb-2 text-body-secondary">{{this.form_type}}</h6>
                 <p class="card-desc">{{this.form_description}}</p>
-                <p class="card-username-date">{{this.form_user}} {{this.form_date}}</a>
+                <p class="card-username-date">{{this.form_user}} {{formatDate this.form_date}}</a>
             </div>
         </div>
         {{/each}}
@@ -117,11 +117,11 @@
                         <label for="formType" class="form-label">Form Type</label>
                         <select class="form-select" id="formType" aria-label="Form Type Selection">
                             <option value="0" selected>Select a Type</option>
-                            <option value="1">Trading</option>
-                            <option value="2">Showcase</option>
-                            <option value="3">Collection</option>
-                            <option value="4">Tournaments</option>
-                            <option value="5">LFG</option>
+                            <option value="Trading">Trading</option>
+                            <option value="Showcase">Showcase</option>
+                            <option value="Collection">Collection</option>
+                            <option value="Tournaments">Tournaments</option>
+                            <option value="LFG">LFG</option>
                         </select>
                         <label for="formDesc" class="form-label">Form Description</label>
                         <textarea type="text" class="form-control" id="formDesc" name="formDesc" required
@@ -201,20 +201,21 @@
                             console.log(data);
 
                             // Dynamically add the new friend to the friend list
-                            const formsGrid = document.querySelector('.forms-grid');
+                            const formsGrid = document.getElementById('forms-gridy');
                             const newCard = document.createElement('div');
                             newCard.classList.add('card');
                             newCard.style.width = '18rem';
                             newCard.style.height = '20rem';
                             newCard.innerHTML = `
                     <div class="card-body">
-                        <h5 class="card-title">${form_name}</h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary">${form_type}</h6>
-                        <p class="card-desc">${form_description}</p>
-                        <p class="card-username-date">${users_name} ${new Date().toISOString().split('T')[0]}</p>
+                        <h5 class="card-title">${data.form.form_name}</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">${data.form.form_type}</h6>
+                        <p class="card-desc">${data.form.form_description}</p>
+                        <p class="card-username-date">${data.form.form_user} ${new Date().toISOString().split('T')[0]}</p>
                     </div>
                 `;
                             formsGrid.insertBefore(newCard, formsGrid.lastElementChild);
+                            //formsGrid.appendChild(newCard);
 
                             // Reset the form inputs
                             document.getElementById('formName').value = '';
