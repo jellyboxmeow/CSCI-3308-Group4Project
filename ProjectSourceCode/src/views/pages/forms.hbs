@@ -74,11 +74,24 @@
         .alert {
             margin-top: 1rem;
         }
+        .bg-img{
+            background-image: url('https://pokemonrevolution.net/forum/uploads/monthly_2021_03/DVMT-6OXcAE2rZY.jpg.afab972f972bd7fbd4253bc7aa1cf27f.jpg');
+            min-height: 100%;
+        }
+        .card-img{
+            background-image: url('https://pbs.twimg.com/media/F3pdcQJXgAAWGVj?format=jpg&name=medium');
+            min-height: 100%;
+        }
     </style>
 </head>
 
+<!-- Background image -->
+<div class="bg-img w3-display-container" id="forms">
+    <div class="w3-display-middle" style="white-space:nowrap;">
+    </div>
+
 <div class="container-fluid my-5">
-    <h1 class="fw-bold text-decoration-underline">Forms</h1>
+    <h1 class="fw-bold text-decoration-underline" style = "color: orange">Forms</h1>
     <div class=""></div>
     <div class="forms-grid" id="forms-gridy">
         {{#each forms}}
@@ -97,6 +110,44 @@
             <div class="card-body">
                 <h5 class="card-title">Add Form</h5>
                 <h1 class="card-subtitle mb-2 text-body-secondary">+</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">Add a New Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCommForm">
+                        <input type="hidden" id="currUsername" value="{{user.username}}">
+                        <label for="formName" class="form-label">Form Title</label>
+                        <input type="text" class="form-control" id="formName" name="formName" required
+                            placeholder="Enter Title">
+                        <label for="formType" class="form-label">Form Type</label>
+                        <select class="form-select" id="formType" aria-label="Form Type Selection">
+                            <option value="0" selected>Select a Type</option>
+                            <option value="Trading">Trading</option>
+                            <option value="Showcase">Showcase</option>
+                            <option value="Collection">Collection</option>
+                            <option value="Tournaments">Tournaments</option>
+                            <option value="LFG">LFG</option>
+                        </select>
+                        <label for="formDesc" class="form-label">Form Description</label>
+                        <textarea type="text" class="form-control" id="formDesc" name="formDesc" required
+                            placeholder="Enter Description"></textarea>
+                        <div class="text-danger" id="error-message" style="display: none;">
+                            <small>This is where messages go</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="addFormBtn">Add Form</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
