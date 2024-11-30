@@ -26,7 +26,7 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-  host: process.env.HOST, // the database server
+  host: "db", // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -415,8 +415,25 @@ app.get('/forms', async (req, res) => {
   res.render('pages/forms', { user: req.session.user, error: null, forms: community_forms || [] })
 });
 
-app.post('/forms/add', async (req, res) => {
+app.post('/add-form', async (req, res) => {
+  //get from body
+  const { form_user, form_name, form_type, form_description } = req.body;
 
+  //send error if any are null
+  if (!form_user || !form_name || !form_type || !form_description) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+  //insert into db
+  try {
+    const query = `INSERT INTO community_forms(form_user, form_name, form_type, form_description, form_date)
+    VALUES($1, $2, $3, $4, CURRENT_DATE) RETURNING *;`;
+    //reset form
+    const newForm = await db.one(query, [form_user, form_name, form_type, form_description]);
+    res.status(200).json({ success: true, message: 'Form added successfully', form: newForm });
+  } catch (error) {
+    console.error('Error adding form:', error);
+    res.status(400).json({ success: false, message: 'Error adding form' });
+  }
 });
 
 app.post('/trade-card', async (req, res) => {
