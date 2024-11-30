@@ -27,6 +27,7 @@ const hbs = handlebars.create({
 // database configuration
 const dbConfig = {
   host: "db", // the database server
+  // host: process.env.HOST, //to let the server be able to run
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -407,6 +408,11 @@ app.post('/add-card', async (req, res) => {
   }
 });
 
+Handlebars.registerHelper('formatDate', function(date) {
+  const formattedDate = new Date(date).toISOString().split('T')[0]; // Format to YYYY-MM-DD
+  return formattedDate;
+});
+
 app.get('/forms', async (req, res) => {
   const formsQuery = 'SELECT * FROM community_forms';
   const community_forms = await db.any(formsQuery);
@@ -420,15 +426,17 @@ app.post('/add-form', async (req, res) => {
   const { form_user, form_name, form_type, form_description } = req.body;
 
   //send error if any are null
+  
   if (!form_user || !form_name || !form_type || !form_description) {
     return res.status(400).json({ success: false, message: 'All fields are required' });
   }
   //insert into db
   try {
+    const formattedDate = new Date().toISOString().split('T')[0];
     const query = `INSERT INTO community_forms(form_user, form_name, form_type, form_description, form_date)
-    VALUES($1, $2, $3, $4, CURRENT_DATE) RETURNING *;`;
+    VALUES($1, $2, $3, $4, $5) RETURNING *;`;
     //reset form
-    const newForm = await db.one(query, [form_user, form_name, form_type, form_description]);
+    const newForm = await db.one(query, [form_user, form_name, form_type, form_description, formattedDate]);
     res.status(200).json({ success: true, message: 'Form added successfully', form: newForm });
   } catch (error) {
     console.error('Error adding form:', error);

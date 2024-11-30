@@ -57,7 +57,7 @@ ALTER TABLE friends ADD CONSTRAINT unique_friendship UNIQUE (user_id, friend_id)
 -- Drop and recreate the `community_forms` table with `form_user` referencing `username`
 DROP TABLE IF EXISTS community_forms CASCADE;
 CREATE TABLE IF NOT EXISTS community_forms(
-    community_forms_id INT PRIMARY KEY,
+    community_forms_id SERIAL PRIMARY KEY,
     form_name VARCHAR(255) NOT NULL,
     form_type VARCHAR(50) NOT NULL,
     form_description TEXT,
