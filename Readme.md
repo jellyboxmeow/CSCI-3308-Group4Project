@@ -1,8 +1,5 @@
 # CSCI-3308 Group Project 012-4 
 
-## Links for members
-* [Project Overview](https://docs.google.com/document/d/1gmu2_jfZWGwO1SRqwGf4KQcAbRFeugXt632pqSCYBZQ/edit?tab=t.0)
-
 ## Brief Application Description
 The goal of our application is to allow trading card collectors to be able to find the value of their cards by searching it up in our application and getting its value. The users will be able to login, save their cards into a collection and trade cards with other users on the platform.
 
@@ -51,3 +48,6 @@ You will see the test run and that is how you run the tests
 
 ## Link to the deployed application
 The [deployed application](https://csci-3308-group4project.onrender.com)
+
+## Link to the Video
+The [video](https://www.youtube.com/watch?v=bNY5wNIz8ng&ab_channel=KristinaNguyen)
